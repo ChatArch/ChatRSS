@@ -1,0 +1,7 @@
+site_name: chatrss 文档
+theme:
+  name: material
+  language: zh
+nav:
+  - 首页: index.md
+  - English: index.en.md
