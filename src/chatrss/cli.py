@@ -169,15 +169,13 @@ def cmd_watch(repo: str | None, interval: int, rsshub_url: str | None,
     effective_user = notify_user or cfg.CHATRSS_LARK_USER_ID.value
     feed_list = [f.strip() for f in feeds.split(",")] if feeds else None
 
-    if not seen_path(r).exists():
-        render_warning(f"未初始化，建议先运行：chatrss init {r}")
-
     click.echo(f"监听：{r}")
     click.echo(f"  RSSHub:   {url}")
     click.echo(f"  feeds:    {feeds or 'issue,pull,repo_event,comments'}")
     click.echo(f"  间隔:     {interval}s")
     click.echo(f"  文档:     {effective_doc or '未配置'}")
     click.echo(f"  通知:     {effective_user or '未配置'}")
+    click.echo(f"  策略:     启动时静默同步，只通知 watch 运行期间的新 issue/PR")
     click.echo()
 
     round_n = 0

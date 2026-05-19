@@ -102,13 +102,15 @@ def init_seen(repo: str, rsshub_url: str = "http://localhost:1200") -> int:
 
 
 def poll_once(repo: str, rsshub_url: str = "http://localhost:1200",
-              feeds: Optional[list[str]] = None) -> list[FeedItem]:
+              feeds: Optional[list[str]] = None,
+              silent: bool = False) -> list[FeedItem]:
     """轮询一次，返回新条目列表，并更新 seen + JSONL。
 
     Args:
         repo: owner/name
         rsshub_url: RSSHub 实例地址
         feeds: 指定拉取的 feed 类型列表（如 ["issue", "pull"]），默认全部
+        silent: 静默模式——更新 seen 状态但不返回新条目也不落盘（用于启动时同步）
     """
     owner, name = repo.split("/", 1)
     all_urls = github_feed_urls(owner, name, rsshub_url)
@@ -121,6 +123,10 @@ def poll_once(repo: str, rsshub_url: str = "http://localhost:1200",
     for item in new_items:
         seen.add(item.guid)
     seen.save()
+
+    if silent:
+        return []   # 静默模式：seen 已更新，但不触发任何动作
+
     _append_jsonl(repo, new_items)
     return new_items
 
@@ -128,7 +134,14 @@ def poll_once(repo: str, rsshub_url: str = "http://localhost:1200",
 def watch(repo: str, interval: int = 300,
           rsshub_url: str = "http://localhost:1200",
           feeds: Optional[list[str]] = None) -> Iterator[list[FeedItem]]:
-    """持续轮询，每次 yield 新条目列表（含空列表）。"""
+    """持续轮询，每次 yield 新条目列表（含空列表）。
+
+    启动时自动执行一次静默同步，把当前 feed 状态全部标记为已见，
+    之后只有 watch 运行期间出现的新条目才会触发动作。
+    """
+    # 启动时静默同步：标记当前所有条目为已见，不触发任何通知
+    poll_once(repo, rsshub_url, feeds, silent=True)
+
     while True:
         items = poll_once(repo, rsshub_url, feeds)
         yield items
