@@ -1,7 +1,17 @@
-"""事件触发动作：飞书消息通知 + 飞书文档更新。"""
+"""事件触发动作：飞书消息通知 + 飞书文档更新。
+
+消息策略：
+- 只对 新建的 issue 和 PR 发消息（source == "issue" or "pull"）
+- repo_event / comments 不发消息，噪音太高
+
+文档策略：
+- 新 issue/PR 追加到对应表格行（用 block_insert_after 插到事件日志表末尾）
+- repo_event 仅落盘 JSONL，不写文档
+"""
 
 from __future__ import annotations
 
+import re
 import subprocess
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -13,26 +23,40 @@ def _now_cn() -> str:
     return (datetime.now(timezone.utc) + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M")
 
 
+def _parse_pub_date(raw: str) -> str:
+    """RSS 日期字符串 → 北京时间 YYYY-MM-DD HH:MM。"""
+    if not raw:
+        return ""
+    try:
+        from email.utils import parsedate_to_datetime
+        dt = parsedate_to_datetime(raw)
+        return (dt.astimezone(timezone(timedelta(hours=8)))).strftime("%Y-%m-%d %H:%M")
+    except Exception:
+        pass
+    try:
+        from dateutil import parser as du
+        dt = du.parse(raw)
+        return (dt.astimezone(timezone(timedelta(hours=8)))).strftime("%Y-%m-%d %H:%M")
+    except Exception:
+        pass
+    return raw[:16]
+
+
 def _run_lark(args: list[str]) -> tuple[int, str, str]:
     result = subprocess.run(["lark-cli"] + args, capture_output=True, text=True)
     return result.returncode, result.stdout, result.stderr
 
 
-# ── 消息格式 ──────────────────────────────────────────────────────────────────
+# ── 飞书消息（只发新 issue/PR）──────────────────────────────────────────────────
 
-_SOURCE_EMOJI = {
-    "issue":      "🐛",
-    "pull":       "🔀",
-    "repo_event": "📦",
-    "comments":   "💬",
-}
+_SOURCE_EMOJI = {"issue": "🐛", "pull": "🔀"}
+_SOURCE_LABEL = {"issue": "新 Issue", "pull": "新 PR",
+                 "repo_event": "仓库事件", "comments": "新评论"}
 
-_SOURCE_LABEL = {
-    "issue":      "新 Issue",
-    "pull":       "新 PR",
-    "repo_event": "仓库事件",
-    "comments":   "新评论",
-}
+
+def _should_notify(item: FeedItem) -> bool:
+    """只对新建的 issue 和 PR 发消息。"""
+    return item.source in ("issue", "pull")
 
 
 def format_message(item: FeedItem, repo: str) -> str:
@@ -44,59 +68,96 @@ def format_message(item: FeedItem, repo: str) -> str:
         f"链接：{item.link}",
     ]
     if item.pub_date:
-        lines.append(f"时间：{item.pub_date[:19]}")
+        lines.append(f"时间：{_parse_pub_date(item.pub_date)}")
     return "\n".join(lines)
 
 
-def send_message(item: FeedItem, repo: str, user_id: str) -> bool:
-    text = format_message(item, repo)
-    code, _, _ = _run_lark([
-        "im", "+messages-send",
-        "--user-id", user_id,
-        "--text", text,
-    ])
-    return code == 0
-
-
 def send_messages(items: list[FeedItem], repo: str, user_id: str) -> int:
+    """只发新 issue/PR 的通知，其余忽略。"""
     ok = 0
     for item in items:
-        if send_message(item, repo, user_id):
+        if not _should_notify(item):
+            continue
+        text = format_message(item, repo)
+        code, _, _ = _run_lark(["im", "+messages-send", "--user-id", user_id, "--text", text])
+        if code == 0:
             ok += 1
     return ok
 
 
-# ── 文档更新 ──────────────────────────────────────────────────────────────────
+# ── 飞书文档（只写新 issue/PR，插入事件日志表格末尾）──────────────────────────
 
-def append_to_doc(items: list[FeedItem], repo: str, doc_token: str) -> int:
-    """将新条目追加到飞书文档的事件日志表格。"""
-    if not items:
+def _extract_number(link: str) -> str:
+    m = re.search(r'/(\d+)$', link or "")
+    return f"#{m.group(1)}" if m else "—"
+
+
+def _build_table_row(item: FeedItem) -> str:
+    """构建 5 列的表格行 XML：时间 | 事件类型 | 编号 | 标题 | 发布时间。"""
+    ts = _now_cn()
+    label = _SOURCE_LABEL.get(item.source, item.source)
+    num = _extract_number(item.link)
+    title = item.title[:60]
+    pub = _parse_pub_date(item.pub_date)
+    return (
+        f'<tr>'
+        f'<td><p>{ts}</p></td>'
+        f'<td><p>{label}</p></td>'
+        f'<td><p><a href="{item.link}">{num}</a></p></td>'
+        f'<td><p>{title}</p></td>'
+        f'<td><p>{pub}</p></td>'
+        f'</tr>'
+    )
+
+
+def _get_last_row_block_id(doc_token: str) -> Optional[str]:
+    """拉取事件日志表格，返回最后一个数据行的最后一个 <p> 的 block id。
+    用来作为 block_insert_after 的锚点。
+    """
+    code, out, _ = _run_lark([
+        "docs", "+fetch", "--api-version", "v2",
+        "--doc", doc_token,
+        "--scope", "keyword", "--keyword", "事件日志",
+    ])
+    if code != 0:
+        return None
+    import json
+    try:
+        content = json.loads(out)["data"]["document"]["content"]
+    except Exception:
+        return None
+    # 找事件日志 table 内所有 <p id="..."> 的最后一个
+    ids = re.findall(r'<p id="(doxcn[^"]+)">', content)
+    # 跳过表头（第一行 5 个 th → 5 个 p），取最后一个数据行末尾的 p
+    return ids[-1] if ids else None
+
+
+def append_to_event_log(items: list[FeedItem], repo: str, doc_token: str) -> int:
+    """将新 issue/PR 条目插入到飞书文档事件日志表格末尾。"""
+    to_write = [item for item in items if _should_notify(item)]
+    if not to_write:
         return 0
 
-    rows = []
-    ts = _now_cn()
-    for item in items:
-        label = _SOURCE_LABEL.get(item.source, item.source)
-        title = item.title[:60]
-        rows.append(
-            f'<tr>'
-            f'<td><p>{ts}</p></td>'
-            f'<td><p>{label}</p></td>'
-            f'<td><p><a href="{item.link}">{title}</a></p></td>'
-            f'<td><p>{item.pub_date[:10] if item.pub_date else ""}</p></td>'
-            f'</tr>'
-        )
+    ok = 0
+    for item in to_write:
+        # 每次都重新拿最后一行，保证顺序正确
+        last_id = _get_last_row_block_id(doc_token)
+        if not last_id:
+            continue
+        row_xml = _build_table_row(item)
+        code, _, _ = _run_lark([
+            "docs", "+update", "--api-version", "v2",
+            "--doc", doc_token,
+            "--command", "block_insert_after",
+            "--block-id", last_id,
+            "--content", row_xml,
+        ])
+        if code == 0:
+            ok += 1
+    return ok
 
-    content = "\n".join(rows)
-    code, _, _ = _run_lark([
-        "docs", "+update",
-        "--api-version", "v2",
-        "--doc", doc_token,
-        "--command", "append",
-        "--content", content,
-    ])
-    return len(items) if code == 0 else 0
 
+# ── 统一处理 ──────────────────────────────────────────────────────────────────
 
 def process_items(
     items: list[FeedItem],
@@ -104,12 +165,16 @@ def process_items(
     user_id: Optional[str] = None,
     doc_token: Optional[str] = None,
 ) -> dict:
-    """统一处理新条目：发消息 + 更新文档。"""
-    stats = {"messages_sent": 0, "doc_rows_added": 0}
+    """处理新条目：只对 issue/PR 发消息 + 写文档，repo_event 仅计入统计。"""
+    stats = {"messages_sent": 0, "doc_rows_added": 0, "skipped": 0}
     if not items:
         return stats
+
+    stats["skipped"] = sum(1 for it in items if not _should_notify(it))
+
     if user_id:
         stats["messages_sent"] = send_messages(items, repo, user_id)
     if doc_token:
-        stats["doc_rows_added"] = append_to_doc(items, repo, doc_token)
+        stats["doc_rows_added"] = append_to_event_log(items, repo, doc_token)
+
     return stats
