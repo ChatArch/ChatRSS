@@ -231,5 +231,31 @@ def cmd_cat(repo: str | None, limit: int, json_output: bool) -> None:
         click.echo(f"    {ev.get('pub_date','')} | {ev.get('link','')}")
 
 
+@main.command("ps")
+def cmd_ps() -> None:
+    """查看当前正在运行的 chatrss watch 进程。"""
+    import subprocess as _sp
+    result = _sp.run(
+        ["pgrep", "-af", "chatrss watch"],
+        capture_output=True, text=True,
+    )
+    lines = [l for l in result.stdout.splitlines() if "pgrep" not in l and l.strip()]
+    if not lines:
+        click.echo("没有正在运行的 chatrss watch 进程。")
+        return
+    click.echo(f"运行中的 watch 进程（{len(lines)} 个）：\n")
+    for line in lines:
+        # 解析 pid 和参数
+        parts = line.split(None, 1)
+        pid = parts[0]
+        cmd = parts[1] if len(parts) > 1 else ""
+        # 提取 repo（第一个非 --flag 的参数）
+        import re as _re
+        repo_m = _re.search(r'watch\s+([^\s-][^\s]*)', cmd)
+        repo = repo_m.group(1) if repo_m else "?"
+        click.echo(f"  pid {pid}  repo: {repo}")
+        click.echo(f"    {cmd[:120]}")
+
+
 if __name__ == "__main__":
     main()
