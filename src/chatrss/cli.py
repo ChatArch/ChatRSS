@@ -40,6 +40,85 @@ def main() -> None:
     """chatrss — RSSHub feed 监听 + 飞书联动。"""
 
 
+# ── server 命令组 ──────────────────────────────────────────────────────────────
+
+@main.group("server")
+def server_group() -> None:
+    """管理本地 RSSHub 服务（基于 docker-compose）。"""
+
+
+@server_group.command("start")
+@click.option("--port", default=1200, type=int, show_default=True, help="监听端口")
+def server_start(port: int) -> None:
+    """启动 RSSHub 容器。"""
+    from chatrss.server import start, is_running, get_url
+
+    if is_running(port):
+        render_warning(f"RSSHub 已在运行：{get_url(port)}")
+        return
+    click.echo("启动 RSSHub...")
+    code = start(port)
+    if code == 0:
+        render_success(f"RSSHub 已启动：{get_url(port)}")
+    else:
+        click.echo("启动失败，请检查 docker-compose 输出", err=True)
+        sys.exit(code)
+
+
+@server_group.command("stop")
+def server_stop() -> None:
+    """停止 RSSHub 容器。"""
+    from chatrss.server import stop
+
+    click.echo("停止 RSSHub...")
+    code = stop()
+    if code == 0:
+        render_success("RSSHub 已停止")
+    else:
+        click.echo("停止失败", err=True)
+
+
+@server_group.command("restart")
+def server_restart() -> None:
+    """重启 RSSHub 容器。"""
+    from chatrss.server import restart
+
+    click.echo("重启 RSSHub...")
+    code = restart()
+    if code == 0:
+        render_success("RSSHub 已重启")
+    else:
+        click.echo("重启失败", err=True)
+
+
+@server_group.command("status")
+def server_status() -> None:
+    """查看 RSSHub 容器状态。"""
+    from chatrss.server import status, is_running
+
+    click.echo(status())
+    health = "✅ 响应正常" if is_running() else "❌ 未响应"
+    click.echo(f"\nhealth: {health}")
+
+
+@server_group.command("logs")
+@click.option("--tail", default=50, type=int, show_default=True)
+def server_logs(tail: int) -> None:
+    """查看 RSSHub 容器日志。"""
+    from chatrss.server import logs
+
+    click.echo(logs(tail))
+
+
+@server_group.command("url")
+def server_url() -> None:
+    """打印当前 RSSHub 地址。"""
+    from chatrss.server import get_url, is_running
+    url = get_url()
+    status = "✅" if is_running() else "❌ 未运行"
+    click.echo(f"{url}  {status}")
+
+
 # ── init ──────────────────────────────────────────────────────────────────────
 
 @main.command("init")
