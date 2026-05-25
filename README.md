@@ -28,6 +28,15 @@ python -m pytest -q
 python -m build
 ```
 
+## 处理策略
+
+`chatrss watch` 现在按任务导向处理新事件：
+
+- `issue` / `pull` / `comments`：视为待处理任务，发送飞书通知并追加文档事件行。
+- `repo_event`：视为背景上下文，只落本地 JSONL，避免噪音。
+- 通知文案强调“先完成当前任务，再看是否需要整理/封装”。
+
+
 ## CLI 规范
 
 这个模板默认依赖 `chatstyle>=0.1.0` 和 `chatenv>=0.1.1`，新的命令应优先使用：
