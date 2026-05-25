@@ -1,12 +1,13 @@
 """事件触发动作：飞书消息通知 + 飞书文档更新。
 
-消息策略：
-- 只对 新建的 issue 和 PR 发消息（source == "issue" or "pull"）
-- repo_event / comments 不发消息，噪音太高
+处理策略：
+- 任务导向：issue / PR / comments 都视为需要处理的任务事件
+- 先完成：通知文案优先给出下一步动作，不先抽象封装流程
+- 后封装：repo_event 仅作为背景上下文落盘 JSONL，不打扰、不写文档
 
 文档策略：
-- 新 issue/PR 追加到对应表格行（用 block_insert_after 插到事件日志表末尾）
-- repo_event 仅落盘 JSONL，不写文档
+- 任务事件追加到事件日志表格末尾（用 block_insert_after 插到表末尾）
+- repo_event 仅落盘 JSONL
 """
 
 from __future__ import annotations
@@ -47,16 +48,26 @@ def _run_lark(args: list[str]) -> tuple[int, str, str]:
     return result.returncode, result.stdout, result.stderr
 
 
-# ── 飞书消息（只发新 issue/PR）──────────────────────────────────────────────────
+# ── 飞书消息（任务事件通知）────────────────────────────────────────────────────
 
-_SOURCE_EMOJI = {"issue": "🐛", "pull": "🔀"}
-_SOURCE_LABEL = {"issue": "新 Issue", "pull": "新 PR",
-                 "repo_event": "仓库事件", "comments": "新评论"}
+_SOURCE_EMOJI = {"issue": "🐛", "pull": "🔀", "comments": "💬"}
+_SOURCE_LABEL = {"issue": "Issue 任务", "pull": "PR 任务",
+                 "repo_event": "仓库事件", "comments": "评论任务"}
+_TASK_ACTION = {
+    "issue": "先判断是否需要修复/回复；能直接处理就先完成。",
+    "pull": "先完成审阅/合并/反馈；之后再考虑是否沉淀流程。",
+    "comments": "先判断评论是否需要回复或代码改动；需要就立即处理。",
+}
+
+
+def _is_task_item(item: FeedItem) -> bool:
+    """需要进入处理流的事件；repo_event 只做背景记录。"""
+    return item.source in ("issue", "pull", "comments")
 
 
 def _should_notify(item: FeedItem) -> bool:
-    """只对新建的 issue 和 PR 发消息。"""
-    return item.source in ("issue", "pull")
+    """需要主动打扰用户的任务事件。"""
+    return _is_task_item(item)
 
 
 def format_message(item: FeedItem, repo: str) -> str:
@@ -66,6 +77,7 @@ def format_message(item: FeedItem, repo: str) -> str:
         f"{emoji} [{label}] {repo}",
         f"标题：{item.title}",
         f"链接：{item.link}",
+        f"处理：{_TASK_ACTION.get(item.source, '先完成当前处理，再看是否需要整理封装。')}",
     ]
     if item.pub_date:
         lines.append(f"时间：{_parse_pub_date(item.pub_date)}")
@@ -73,7 +85,7 @@ def format_message(item: FeedItem, repo: str) -> str:
 
 
 def send_messages(items: list[FeedItem], repo: str, user_id: str) -> int:
-    """只发新 issue/PR 的通知，其余忽略。"""
+    """发送任务通知；背景事件忽略。"""
     ok = 0
     for item in items:
         if not _should_notify(item):
@@ -85,7 +97,7 @@ def send_messages(items: list[FeedItem], repo: str, user_id: str) -> int:
     return ok
 
 
-# ── 飞书文档（只写新 issue/PR，插入事件日志表格末尾）──────────────────────────
+# ── 飞书文档（任务事件插入事件日志表格末尾）───────────────────────────────────
 
 def _extract_number(link: str) -> str:
     m = re.search(r'/(\d+)$', link or "")
@@ -133,8 +145,8 @@ def _get_last_row_block_id(doc_token: str) -> Optional[str]:
 
 
 def append_to_event_log(items: list[FeedItem], repo: str, doc_token: str) -> int:
-    """将新 issue/PR 条目插入到飞书文档事件日志表格末尾。"""
-    to_write = [item for item in items if _should_notify(item)]
+    """将任务事件插入到飞书文档事件日志表格末尾。"""
+    to_write = [item for item in items if _is_task_item(item)]
     if not to_write:
         return 0
 
@@ -165,12 +177,13 @@ def process_items(
     user_id: Optional[str] = None,
     doc_token: Optional[str] = None,
 ) -> dict:
-    """处理新条目：只对 issue/PR 发消息 + 写文档，repo_event 仅计入统计。"""
-    stats = {"messages_sent": 0, "doc_rows_added": 0, "skipped": 0}
+    """处理新条目：任务事件通知/写文档，repo_event 仅计入背景统计。"""
+    stats = {"messages_sent": 0, "doc_rows_added": 0, "tasks": 0, "skipped": 0}
     if not items:
         return stats
 
-    stats["skipped"] = sum(1 for it in items if not _should_notify(it))
+    stats["tasks"] = sum(1 for it in items if _is_task_item(it))
+    stats["skipped"] = len(items) - stats["tasks"]
 
     if user_id:
         stats["messages_sent"] = send_messages(items, repo, user_id)

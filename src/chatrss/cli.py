@@ -175,7 +175,7 @@ def cmd_watch(repo: str | None, interval: int, rsshub_url: str | None,
     click.echo(f"  间隔:     {interval}s")
     click.echo(f"  文档:     {effective_doc or '未配置'}")
     click.echo(f"  通知:     {effective_user or '未配置'}")
-    click.echo(f"  策略:     启动时静默同步，只通知 watch 运行期间的新 issue/PR")
+    click.echo(f"  策略:     启动时静默同步；issue/PR/comment 作为任务处理，repo_event 只落盘")
     click.echo()
 
     round_n = 0
