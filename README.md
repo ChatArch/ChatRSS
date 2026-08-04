@@ -37,6 +37,16 @@ python -m build
 - 通知文案强调“先完成当前任务，再看是否需要整理/封装”。
 
 
+## Trigger-Router-Action MVP
+
+`chatrss flow demo` 可以在本地跑通最小 trigger-router-action 闭环：内置示例事件会被标准化为 Event，经规则和 model-router stub 判断后，生成 dry-run action 并写入 JSONL ledger。
+
+```bash
+chatrss flow demo --ledger ./playground/flow.ledger.jsonl --json-output
+```
+
+这个 MVP 用来验证新的 minor 版本方向：RSS/RSSHub 先作为 trigger connector，后续再连接真实社区对话源、GitHub 项目进展、模型判断和 action adapter。
+
 ## CLI 规范
 
 这个模板默认依赖 `chatstyle>=0.1.0` 和 `chatenv>=0.1.1`，新的命令应优先使用：

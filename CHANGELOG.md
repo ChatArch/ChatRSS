@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-05
+
+### Added
+
+- Added a `chatrss flow demo` command that runs a local trigger-router-action MVP: sample trigger event → normalized schema → rule/model router → dry-run actions → JSONL ledger.
+- Added shared event/action schema and a minimal pipeline module for future RSSHub, community, and project-progress trigger connectors.
+- Added `docs/trigger-router-action.md` with the initial architecture and practice-source plan.
+- Added a Zulip @mention quick start report from `zhihong.oray`: two accounts, watcher API polling, mention detection, event normalization, routing, dry-run actions, and ledger verification.
+
 ## 2026-05-21
 
 ### Changed
