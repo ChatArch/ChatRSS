@@ -1,6 +1,28 @@
 # ChatRSS 真实平台实践计划
 
-目标：用现有社区和代码托管平台跑通真实 trigger，而不是只停留在抽象 demo。第一批实践来源包括 `zhihong.oray` 上的 Discourse、Zulip、Revolt，以及 GitHub/Gitea 项目进展。
+目标：用现有社区和代码托管平台跑通真实 trigger，而不是只停留在抽象 demo。第一批实践来源包括 `zhihong.oray` 上的 Zulip、Discourse、Mattermost、Revolt，以及 GitHub/Gitea 项目进展。
+
+## 已验证平台入口
+
+| 平台 | 独立文档 | 统一 actor | 接入判断 |
+| --- | --- | --- | --- |
+| Zulip | [Zulip 平台案例](platforms/zulip.md) | `RexWang` | 直接用 Zulip messages/events API；不需要 RSSHub。 |
+| Discourse | [Discourse 平台案例](platforms/discourse.md) | `RexWang` | 适合 forum/topic connector；登录态/API/服务端回读验收。 |
+| Mattermost | [Mattermost 平台案例](platforms/mattermost.md) | `RexWang` | 实时 Agent 房间优先走 Hermes/Mattermost gateway；ChatRSS 只在需要统一去重、路由和 ledger 时接入。 |
+
+这些平台的共同产品语义是：
+
+```text
+前置动作 / platform event / feed item
+  -> Trigger Connector
+  -> TriggerEvent
+  -> Event Inbox / Dedupe
+  -> Rule Router
+  -> Model Router
+  -> Action Planner
+  -> Action Executor
+  -> Ledger / Audit
+```
 
 ## 1. 实践原则
 

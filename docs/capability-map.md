@@ -10,10 +10,10 @@
 | Event Schema | 已实现 `TriggerEvent` / `ActionJob` / `RouteDecision` | `chatrss.events` | 所有 connector 统一输出这个 envelope |
 | Rule Router | 已实现最小规则 | `chatrss.pipeline.route_event` | 可配置 YAML/JSON rules，先降噪再进模型 |
 | Model Router | 已实现 deterministic stub | `chatrss.pipeline.model_route_event` | LLM JSON decision，保留 schema 校验和解释 |
-| Action Planner | 已实现 dry-run plan；真实平台案例已记录 `zulip.message.reply` 和 `discourse.post.reply` action | `chatrss.pipeline.plan_actions` / [真实事件案例](real-world-cases.md) | 输出 action outbox，带 idempotency key |
-| Action Executor | 包内已实现 dry-run executor；远端实践验证 Zulip 与 Discourse action bot 回帖 | `chatrss.pipeline.execute_action` / [真实事件案例](real-world-cases.md) | Feishu/GitHub/Gitea/Zulip/agent adapters |
+| Action Planner | 已实现 dry-run plan；真实平台案例已记录 `zulip.message.reply`、`discourse.post.reply` 和 `mattermost.thread_reply` action | `chatrss.pipeline.plan_actions` / [真实事件案例](real-world-cases.md) | 输出 action outbox，带 idempotency key |
+| Action Executor | 包内已实现 dry-run executor；远端实践验证 Zulip、Discourse 与 Mattermost action bot 回帖 | `chatrss.pipeline.execute_action` / [真实事件案例](real-world-cases.md) | Feishu/GitHub/Gitea/Zulip/Mattermost/agent adapters |
 | Ledger | 已实现 JSONL flow ledger | `chatrss.pipeline.append_ledger` / `read_ledger` | SQLite/Postgres inbox/outbox/ledger，可重放和审计 |
-| 真实社区 trigger | 已验证 Zulip @mention 与 Discourse topic/post -> worker -> action bot 回帖 | [真实事件案例](real-world-cases.md) / [Zulip quick start](zulip-quickstart.md) | Zulip/Discourse/Revolt connector |
+| 真实社区 trigger | 已验证 Zulip @mention、Discourse topic/post、Mattermost @bot -> action bot 回帖 | [真实事件案例](real-world-cases.md) / [平台案例](platforms/mattermost.md) | Zulip/Discourse/Mattermost/Revolt connector |
 
 ## 责任边界
 
@@ -49,4 +49,5 @@
 | Gitea 协作事件 | notifications API / issue / PR comments | agent.run + gitea.comment.draft |
 | Zulip 社区消息 | messages/events API + mention flag | agent.run + zulip.message.reply（默认 draft/approval，可授权执行） |
 | Discourse 论坛 | notifications/topics/posts API / posts watcher | agent.run + discourse.post.reply（默认 draft/approval，可授权执行） |
+| Mattermost 实时房间 | Hermes Mattermost gateway / WebSocket / outgoing webhook；ChatRSS connector 可选 | 优先 direct thread reply；需要统一审计时进入 TriggerEvent + ledger |
 | Revolt 频道 | bot token + gateway 或 REST polling | agent.run + revolt.message.draft |

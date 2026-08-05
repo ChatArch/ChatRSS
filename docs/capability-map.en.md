@@ -10,10 +10,10 @@ The capability map answers what ChatRSS owns and what it does not own. Invocatio
 | Event Schema | `TriggerEvent` / `ActionJob` / `RouteDecision` implemented | `chatrss.events` | Every connector emits this envelope |
 | Rule Router | Minimal rules implemented | `chatrss.pipeline.route_event` | Configurable YAML/JSON rules before model routing |
 | Model Router | Deterministic stub implemented | `chatrss.pipeline.model_route_event` | LLM JSON decision with schema validation and explanations |
-| Action Planner | Dry-run planning implemented; real platform cases record `zulip.message.reply` and `discourse.post.reply` actions | `chatrss.pipeline.plan_actions` / [real-world cases](real-world-cases.en.md) | Action outbox with idempotency keys |
-| Action Executor | Package executor is dry-run; host-side practices verified Zulip and Discourse action-bot replies | `chatrss.pipeline.execute_action` / [real-world cases](real-world-cases.en.md) | Feishu/GitHub/Gitea/Zulip/agent adapters |
+| Action Planner | Dry-run planning implemented; real platform cases record `zulip.message.reply`, `discourse.post.reply`, and `mattermost.thread_reply` actions | `chatrss.pipeline.plan_actions` / [real-world cases](real-world-cases.en.md) | Action outbox with idempotency keys |
+| Action Executor | Package executor is dry-run; host-side practices verified Zulip, Discourse, and Mattermost action-bot replies | `chatrss.pipeline.execute_action` / [real-world cases](real-world-cases.en.md) | Feishu/GitHub/Gitea/Zulip/Mattermost/agent adapters |
 | Ledger | JSONL flow ledger implemented | `append_ledger` / `read_ledger` | SQLite/Postgres inbox/outbox/ledger with replay and audit |
-| Real community trigger | Zulip @mention and Discourse topic/post -> worker -> action-bot reply verified | [real-world cases](real-world-cases.en.md) / [Zulip quick start](zulip-quickstart.en.md) | Zulip/Discourse/Revolt connectors |
+| Real community trigger | Zulip @mention, Discourse topic/post, and Mattermost @bot -> action-bot reply verified | [real-world cases](real-world-cases.en.md) / [Mattermost platform case](platforms/mattermost.en.md) | Zulip/Discourse/Mattermost/Revolt connectors |
 
 ## Responsibility boundaries
 
@@ -49,4 +49,5 @@ The capability map answers what ChatRSS owns and what it does not own. Invocatio
 | Gitea collaboration events | notifications API / issue / PR comments | agent.run + gitea.comment.draft |
 | Zulip community messages | messages/events API + mention flag | agent.run + zulip.message.reply (draft/approval by default, executable when authorized) |
 | Discourse forum | notifications/topics/posts API / posts watcher | agent.run + discourse.post.reply (draft/approval by default, executable when authorized) |
+| Mattermost realtime rooms | Hermes Mattermost gateway / WebSocket / outgoing webhook; ChatRSS connector optional | Prefer direct thread reply; enter TriggerEvent + ledger when unified audit is needed |
 | Revolt channels | bot token + gateway or REST polling | agent.run + revolt.message.draft |

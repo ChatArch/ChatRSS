@@ -29,7 +29,7 @@ Documentation: <https://arch.gh.wzhecnu.cn/ChatRSS/>
 | Local RSSHub container helper | Implemented, requires local Docker / docker-compose | `chatrss server ...` |
 | Local event log inspection | Implemented | `chatrss cat` |
 | Trigger-Router-Action local flow | Implemented dry-run MVP | `chatrss flow demo` |
-| Real Zulip / Discourse trigger + reply cases | Verified on `zhihong.oray` with real platform accounts | [Real-world cases](docs/real-world-cases.en.md) |
+| Real Zulip / Discourse / Mattermost trigger + reply cases | Verified on `zhihong.oray` with shared actor `RexWang` | [Real-world cases](docs/real-world-cases.en.md) / [Mattermost](docs/platforms/mattermost.en.md) |
 | Multi-platform trigger / router / action framework | Planned, with schema and dry-run seams already in place | [Capability map](docs/capability-map.en.md) |
 
 ## Quick start
@@ -56,7 +56,7 @@ PYTHONPATH=src python -m chatrss.cli flow demo --ledger ./playground/flow.ledger
 - [Capability map](docs/capability-map.en.md): Trigger, Event, Router, Model, Action, and Ledger status.
 - [Interface tree](docs/interface-tree.en.md): CLI-to-Python API/module mapping.
 - [Trigger-Router-Action design](docs/trigger-router-action.md): architecture and event protocol.
-- [Real platform practice plan](docs/practice-plan.md): Discourse, Zulip, Revolt, GitHub, and Gitea sequence.
+- [Real platform practice plan](docs/practice-plan.md): Zulip, Discourse, Mattermost, Revolt, GitHub, and Gitea sequence.
 - [Real-world cases](docs/real-world-cases.en.md): verified actor -> watcher -> worker -> action-bot loops.
 - [Zulip @mention quick start](docs/zulip-quickstart.en.md): Zulip trigger setup and verification.
 

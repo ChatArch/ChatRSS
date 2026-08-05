@@ -11,6 +11,8 @@
 - Added ChatTea-style MkDocs documentation structure: scenario hub, CLI tree, capability map, interface tree, quick start, bilingual page mirrors, ChatArch Pages URLs, and preview workflow URL alignment.
 - Added a real-world Zulip case: actor mention -> watcher trigger -> normalized event -> router decision -> Codex-plan research worker -> `zulip.message.reply` action bot reply -> ledger verification.
 - Added a real-world Discourse case: `RexWang` topic/post -> `discourse.posts` TriggerEvent -> route decision -> `discourse.post.reply` action bot reply -> web readback verification.
+- Added a real-world Mattermost case: `RexWang` @`hermes-agent` in `agent-lab/agent-room` -> `mattermost.posts` event -> `mattermost.thread_reply` bot reply, documenting when direct Mattermost gateway is simpler than ChatRSS.
+- Split platform evidence into independent Zulip, Discourse, and Mattermost Markdown pages with RexWang-aligned conversation screenshots.
 
 ## 2026-05-21
 

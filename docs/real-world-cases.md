@@ -1,6 +1,16 @@
 # 真实事件案例
 
-这一页记录 ChatRSS 从“抽象 trigger-router-action demo”走到真实平台闭环的实践案例。重点不是手动复制一段结果，而是让平台上的真实事件触发 ChatRSS，然后由 worker 完成任务并通过 action bot 回帖。当前已验证 Zulip @mention 和 Discourse topic/post 两种社区平台形态。
+这一页记录 ChatRSS 从“抽象 trigger-router-action demo”走到真实平台闭环的实践案例。重点不是手动复制一段结果，而是让平台上的真实前置动作触发 ChatRSS / gateway，然后由 worker/action bot 完成任务并回帖。
+
+当前已验证并拆成独立页面：
+
+| 平台 | 独立页面 | 统一 actor | TriggerEvent | 证据截图 |
+| --- | --- | --- | --- | --- |
+| Zulip | [Zulip 平台案例](platforms/zulip.md) | `RexWang` | `zulip:message:24:mention:chatrss-watcher@chatarch.local` | `assets/platform-cases/zulip-rexwang-conversation.png` |
+| Discourse | [Discourse 平台案例](platforms/discourse.md) | `RexWang` | `discourse:post:25:mention:system` | `assets/platform-cases/discourse-rexwang-conversation.png` |
+| Mattermost | [Mattermost 平台案例](platforms/mattermost.md) | `RexWang` | `mattermost:post:q7xk8wq3q3rbugodkdw6u8cuka:mention:hermes-agent` | `assets/platform-cases/mattermost-rexwang-conversation.png` |
+
+核心语义是：**总是先有外部前置动作 / platform event / feed item，connector 再生成 `TriggerEvent`，之后才有 ChatRSS 的行动内容。** Mattermost 这类 chat-native 平台可以直接走 Hermes/Mattermost gateway；只有在需要跨平台统一去重、路由、模型判断和审计时，才需要把 Mattermost event 再接入 ChatRSS。
 
 ## 案例：Zulip @mention 触发 Codex 方案分析
 

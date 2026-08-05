@@ -32,6 +32,9 @@ def test_mkdocs_nav_exposes_chatarch_docs_surfaces():
         "trigger-router-action.md",
         "practice-plan.md",
         "real-world-cases.md",
+        "platforms/zulip.md",
+        "platforms/discourse.md",
+        "platforms/mattermost.md",
         "zulip-quickstart.md",
     ]:
         assert page in text
@@ -70,12 +73,49 @@ def test_real_world_case_documents_complete_platform_reply_loops():
         assert "discourse:post:25:mention:system" in text
         assert "discourse.post.reply" in text
         assert "chatrss-discourse-trigger-20260805022954" in text
+        assert "mattermost:post:q7xk8wq3q3rbugodkdw6u8cuka:mention:hermes-agent" in text
+        assert "mattermost.thread_reply" in _read("docs/platforms/mattermost.md")
         assert "action_verified" in text
         assert "message_id=21" in text
         assert "post_id=26" in text
         assert "API key" in text
     assert "real-world-cases.md" in nav
     assert "Real-World Event Cases" in nav
+
+
+def test_platform_case_pages_have_shared_actor_and_screenshots():
+    cases = {
+        "docs/platforms/zulip.md": [
+            "RexWang",
+            "zulip:message:24:mention:chatrss-watcher@chatarch.local",
+            "../assets/platform-cases/zulip-rexwang-conversation.png",
+        ],
+        "docs/platforms/discourse.md": [
+            "RexWang",
+            "discourse:post:25:mention:system",
+            "../assets/platform-cases/discourse-rexwang-conversation.png",
+        ],
+        "docs/platforms/mattermost.md": [
+            "RexWang",
+            "mattermost:post:q7xk8wq3q3rbugodkdw6u8cuka:mention:hermes-agent",
+            "../assets/platform-cases/mattermost-rexwang-conversation.png",
+            "直接走 Hermes/Mattermost gateway",
+            "不需要先绕 RSSHub",
+        ],
+    }
+    for path, markers in cases.items():
+        text = _read(path)
+        for marker in markers:
+            assert marker in text
+
+    for image in [
+        "docs/assets/platform-cases/zulip-rexwang-conversation.png",
+        "docs/assets/platform-cases/discourse-rexwang-conversation.png",
+        "docs/assets/platform-cases/mattermost-rexwang-conversation.png",
+    ]:
+        image_path = Path(image)
+        assert image_path.exists()
+        assert image_path.stat().st_size > 50_000
 
 
 def test_zulip_quickstart_links_to_complete_case():

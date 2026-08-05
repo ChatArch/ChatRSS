@@ -1,6 +1,16 @@
 # Real-World Event Cases
 
-This page records how ChatRSS moves from an abstract trigger-router-action demo to real platform loops. The important point is that the task starts as a real platform event: a user-visible message, topic, post, or mention triggers ChatRSS, a worker completes the task, and an action bot writes back. Zulip @mentions and Discourse topic/posts are now both verified community-platform shapes.
+This page records how ChatRSS moves from an abstract trigger-router-action demo to real platform loops. The important point is that the task starts as a real **pre-action** in a platform: a user-visible message, topic, post, mention, feed item, or webhook event wakes the system; only then does ChatRSS/gateway extract task intent and plan an action.
+
+Verified cases now have their own pages:
+
+| Platform | Page | Shared actor | TriggerEvent | Evidence screenshot |
+| --- | --- | --- | --- | --- |
+| Zulip | [Zulip Platform Case](platforms/zulip.md) | `RexWang` | `zulip:message:24:mention:chatrss-watcher@chatarch.local` | `assets/platform-cases/zulip-rexwang-conversation.png` |
+| Discourse | [Discourse Platform Case](platforms/discourse.md) | `RexWang` | `discourse:post:25:mention:system` | `assets/platform-cases/discourse-rexwang-conversation.png` |
+| Mattermost | [Mattermost Platform Case](platforms/mattermost.md) | `RexWang` | `mattermost:post:q7xk8wq3q3rbugodkdw6u8cuka:mention:hermes-agent` | `assets/platform-cases/mattermost-rexwang-conversation.png` |
+
+Core semantics: **a platform event or feed item always comes before ChatRSS action content.** Mattermost-like chat-native platforms can use the direct Hermes/Mattermost gateway; ChatRSS is useful when the event should enter shared dedupe, routing, model decisions, and audit across platforms.
 
 ## Case: Zulip @mention triggers a Codex plan analysis
 

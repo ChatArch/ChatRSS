@@ -4,9 +4,27 @@ ChatRSS 的 minor 版本方向不再只是“GitHub RSS 通知器”，而是一
 
 ## 核心抽象
 
+ChatRSS 的触发不是“agent 凭空开始行动”，而是始终先有一个平台上的**前置动作**：用户 @bot、发帖、评论、RSS/RSSHub 出现新 item、webhook 收到事件，或 polling 发现外部状态变化。之后才从这个事件中提取行动内容。
+
+```text
+Trigger Act / 前置动作
+  -> Source Event / 平台原始事件
+  -> TriggerEvent / 统一事件
+  -> Intent Extraction / 行动意图提取
+  -> Rule Router
+  -> Model Router
+  -> Action Planner
+  -> Action Executor
+  -> Ledger
+```
+
+简写仍然可以叫：
+
 ```text
 Trigger -> Event Schema -> Router -> Action Planner -> Action Executor -> Ledger
 ```
+
+但语义上必须记住：**Trigger 负责唤醒，事件内容负责说明要做什么，Router 决定要不要做，Executor 才真正行动。**
 
 对应用户给出的产品抽象：
 
@@ -14,7 +32,7 @@ Trigger -> Event Schema -> Router -> Action Planner -> Action Executor -> Ledger
 (trigger, router, action)
 ```
 
-## 1. Trigger：只负责发现和标准化事件
+## 1. Trigger：只负责观察前置事件并标准化
 
 Trigger 层可以来自：
 
@@ -22,9 +40,12 @@ Trigger 层可以来自：
 - RSSHub route
 - Webhook
 - API poller
+- Zulip / Discourse / Mattermost 等社区平台事件
 - 后续的 Feishu/Discord/GitHub native event connector
 
-MVP 先只落 RSS/RSSHub。Trigger 不直接发送消息、不直接评论、不直接启动 agent。它只把外部 item 转成统一事件，并交给后续层。
+Trigger 不直接发送消息、不直接评论、不直接启动 agent。它只观察外部前置动作产生的 source event，并转成统一 `TriggerEvent`。行动内容来自事件 payload，是否执行由 Router/Model 后续判断。
+
+MVP 的第一批代码先落 RSS/RSSHub；真实平台实践已经验证 Zulip、Discourse、Mattermost 三种社区形态。
 
 ## 2. Event Schema：连接层协议
 
@@ -123,8 +144,9 @@ MVP 用 JSONL ledger，记录：
 
 | 平台 | 第一信号 | Trigger 目标 |
 | --- | --- | --- |
+| Zulip | 指定 stream/topic 中的新消息、@mention、指定 sender | 产生 `community.message.created` / `community.mention.created` 事件 |
 | Discourse | 新帖、回复、@mention、指定用户发言 | 产生 `community.post.created` / `community.mention.created` 事件 |
-| Zulip | 指定 stream/topic 中的新消息、@mention、指定 sender | 产生 `community.message.created` 事件 |
+| Mattermost | channel message、@bot、slash command、outgoing webhook、WebSocket event | 优先 direct gateway；需要统一审计时产生 `community.mention.created` 事件 |
 | Revolt | 指定 channel 中的新消息、@mention、指定 sender | 产生 `community.message.created` 事件 |
 
 实践验收样例：一个模型或用户在社区中发帖/留言并 @ 某个约定对象；ChatRSS connector 能收到信号，标准化成 Event，Router 判断后生成提醒或 agent dry-run action。

@@ -46,6 +46,10 @@ plugins:
             实践: Practice
             真实平台实践计划: Real Platform Practice Plan
             真实事件案例: Real-World Event Cases
+            平台案例: Platform Cases
+            Zulip 平台案例: Zulip Platform Case
+            Discourse 平台案例: Discourse Platform Case
+            Mattermost 平台案例: Mattermost Platform Case
             Zulip @mention 快速开始: Zulip @mention Quick Start
 extra:
   alternate:
@@ -75,4 +79,8 @@ nav:
   - 实践:
       - 真实平台实践计划: practice-plan.md
       - 真实事件案例: real-world-cases.md
+      - 平台案例:
+          - Zulip 平台案例: platforms/zulip.md
+          - Discourse 平台案例: platforms/discourse.md
+          - Mattermost 平台案例: platforms/mattermost.md
       - Zulip @mention 快速开始: zulip-quickstart.md

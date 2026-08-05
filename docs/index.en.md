@@ -14,7 +14,7 @@ Site: <https://arch.gh.wzhecnu.cn/ChatRSS/>
 | Map CLI commands to Python APIs | [Interface tree](interface-tree.en.md) |
 | Understand Trigger / Schema / Router / Model / Action / Ledger | [Trigger-Router-Action design](trigger-router-action.md) |
 | Pick a real platform trigger practice | [Real platform practice plan](practice-plan.md) |
-| Review a real platform loop | [Real-world cases](real-world-cases.en.md) / [Zulip @mention quick start](zulip-quickstart.en.md) |
+| Review a real platform loop | [Real-world cases](real-world-cases.en.md) / [Zulip](platforms/zulip.en.md) / [Discourse](platforms/discourse.en.md) / [Mattermost](platforms/mattermost.en.md) / [Zulip @mention quick start](zulip-quickstart.en.md) |
 
 ## Documentation sections
 
@@ -34,7 +34,7 @@ Site: <https://arch.gh.wzhecnu.cn/ChatRSS/>
 
 - **Practice**
 
-  Zulip and Discourse are verified real trigger/action cases; Revolt, GitHub, and Gitea follow the same pattern.
+  Zulip, Discourse, and Mattermost are verified real trigger/action cases. Mattermost should use the direct gateway for realtime agent rooms; ChatRSS is the optional shared router/ledger layer.
 
 </div>
 
