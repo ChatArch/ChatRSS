@@ -14,6 +14,10 @@
 - Added a real-world Mattermost case: `RexWang` @`hermes-agent` in `agent-lab/agent-room` -> `mattermost.posts` event -> `mattermost.thread_reply` bot reply, documenting when direct Mattermost gateway is simpler than ChatRSS.
 - Split platform evidence into independent Zulip, Discourse, and Mattermost Markdown pages with RexWang-aligned conversation screenshots.
 
+### Changed
+
+- Bounded ChatArch internal dependencies for release: `chatstyle>=0.1.1,<0.2.0` and `chatenv>=0.2.3,<0.3.0`.
+
 ## 2026-05-21
 
 ### Changed
