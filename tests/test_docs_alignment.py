@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import yaml
+
 
 def _read(path: str) -> str:
     return Path(path).read_text(encoding="utf-8")
@@ -32,6 +34,17 @@ def test_mkdocs_nav_exposes_chatarch_docs_surfaces():
         "zulip-quickstart.md",
     ]:
         assert page in text
+
+
+def test_preview_workflow_parses_and_uses_chatarch_url():
+    text = _read(".github/workflows/preview.yaml")
+    data = yaml.safe_load(text)
+
+    assert data["name"] == "Preview Docs"
+    assert "jobs" in data
+    assert "github.io" not in text
+    assert "CHATARCH_PREVIEW_URL" in text
+    assert "\\nPreview available at:" in text
 
 
 def test_chinese_default_zulip_page_has_english_mirror():

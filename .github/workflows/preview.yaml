@@ -50,8 +50,7 @@ jobs:
             const { payload, repo } = context;
             const marker = '<!-- chatrss-docs-preview -->';
             const previewLink = process.env.CHATARCH_PREVIEW_URL;
-            const body = `${marker}
-Preview available at: ${previewLink}`;
+            const body = `${marker}\nPreview available at: ${previewLink}`;
             const comments = await github.rest.issues.listComments({
               owner: repo.owner,
               repo: repo.repo,
