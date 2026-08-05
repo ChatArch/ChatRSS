@@ -56,8 +56,8 @@ PYTHONPATH=src python -m chatrss.cli flow demo --ledger ./playground/flow.ledger
 - [能力地图](docs/capability-map.md)：Trigger、Event、Router、Model、Action、Ledger 的状态和边界。
 - [接口树](docs/interface-tree.md)：CLI 到 Python API / module 的映射。
 - [Trigger-Router-Action 设计](docs/trigger-router-action.md)：架构和事件协议。
-- [真实平台实践计划](docs/practice-plan.md)：Discourse、Zulip、Revolt、GitHub、Gitea 接入顺序。
-- [真实事件案例](docs/real-world-cases.md)：Zulip 与 Discourse 的真实平台 trigger/action 闭环。
+- [真实平台实践计划](docs/practice-plan.md)：Zulip、Discourse、Mattermost、Revolt、GitHub、Gitea 接入顺序。
+- [真实事件案例](docs/real-world-cases.md)：Zulip、Discourse、Mattermost 的真实平台 trigger/action 闭环。
 - [Zulip @mention 快速开始](docs/zulip-quickstart.md)：第一条真实平台 trigger 验证。
 
 ## Minor 版本方向

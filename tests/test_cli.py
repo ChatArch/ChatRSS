@@ -16,7 +16,7 @@ def test_main_help():
 def test_version_option():
     r = CliRunner().invoke(main, ["--version"])
     assert r.exit_code == 0
-    assert "chatrss, version 0.1.0" in r.output
+    assert "chatrss, version 0.1.1" in r.output
 
 
 def test_init_help():

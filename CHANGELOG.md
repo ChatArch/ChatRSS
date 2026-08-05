@@ -18,6 +18,10 @@
 
 - Bounded ChatArch internal dependencies for release: `chatstyle>=0.1.1,<0.2.0` and `chatenv>=0.2.3,<0.3.0`.
 
+### Fixed
+
+- Corrected README documentation-map wording so Zulip, Discourse, and Mattermost are all listed consistently in the real-platform case links.
+
 ## 2026-05-21
 
 ### Changed
