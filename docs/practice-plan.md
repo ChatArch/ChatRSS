@@ -11,7 +11,7 @@
    - `watcher account`：由 ChatRSS 托管，专门接收 mention/通知/消息。
    - `action account`：需要真实回复/留言时才启用；默认 dry-run/draft，明确授权后可执行并验证。
 4. **Trigger 不直接执行动作**：trigger 捕获信号后只产出标准 Event，后续由 router/model/action 处理。
-5. **外部写动作默认 dry-run / draft**：真实回复、发帖、评论必须进入审批或单独授权；已验证 Zulip 授权回帖案例见 [真实事件案例](real-world-cases.md)。
+5. **外部写动作默认 dry-run / draft**：真实回复、发帖、评论必须进入审批或单独授权；已验证 Zulip 和 Discourse 授权回帖案例见 [真实事件案例](real-world-cases.md)。
 
 ## 2. 平台和第一批 trigger 定义
 
@@ -25,13 +25,15 @@
 | --- | --- |
 | `discourse-actor` | 发帖、回复、@ watcher。 |
 | `discourse-watcher` | ChatRSS 托管，读取 notifications / topics / posts。 |
-| `discourse-action` | 后续真实回复账号；MVP 不启用真实写。 |
+| `discourse-action` | 后续真实回复账号；默认 draft/approval，授权案例中执行 `discourse.post.reply`。 |
 
 优先入口：
 
 - Discourse API key + username；
 - notifications endpoint，用 watcher 账号检查 @mention / reply；
 - topics/posts endpoint，用于读取关联上下文。
+
+已验证实践：`RexWang` 在 `Agent Runs` 分类创建真实 topic/post，`discourse.posts` watcher 标准化为 `discourse:post:25:mention:system`，action executor 写入 `discourse.post.reply`，并用 RexWang 登录态回读 topic JSON 验证 post `25` 与 reply `26`。详见 [真实事件案例](real-world-cases.md)。
 
 第一批规则：
 

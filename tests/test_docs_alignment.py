@@ -58,7 +58,7 @@ def test_chinese_default_zulip_page_has_english_mirror():
     assert "API key" in en
 
 
-def test_real_world_case_documents_complete_zulip_reply_loop():
+def test_real_world_case_documents_complete_platform_reply_loops():
     zh = _read("docs/real-world-cases.md")
     en = _read("docs/real-world-cases.en.md")
     nav = _read("mkdocs.yml")
@@ -67,8 +67,12 @@ def test_real_world_case_documents_complete_zulip_reply_loop():
         assert "codex-plan-20260805012352" in text
         assert "zulip:message:20:mention:chatrss-watcher@chatarch.local" in text
         assert "zulip.message.reply" in text
+        assert "discourse:post:25:mention:system" in text
+        assert "discourse.post.reply" in text
+        assert "chatrss-discourse-trigger-20260805022954" in text
         assert "action_verified" in text
         assert "message_id=21" in text
+        assert "post_id=26" in text
         assert "API key" in text
     assert "real-world-cases.md" in nav
     assert "Real-World Event Cases" in nav

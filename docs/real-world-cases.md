@@ -1,6 +1,6 @@
 # 真实事件案例
 
-这一页记录 ChatRSS 从“抽象 trigger-router-action demo”走到真实平台闭环的实践案例。重点不是手动复制一段结果，而是让平台上的真实 @mention 触发 ChatRSS，然后由 worker 完成任务并通过 action bot 回帖。
+这一页记录 ChatRSS 从“抽象 trigger-router-action demo”走到真实平台闭环的实践案例。重点不是手动复制一段结果，而是让平台上的真实事件触发 ChatRSS，然后由 worker 完成任务并通过 action bot 回帖。当前已验证 Zulip @mention 和 Discourse topic/post 两种社区平台形态。
 
 ## 案例：Zulip @mention 触发 Codex 方案分析
 
@@ -111,6 +111,105 @@ action_verified: visible_to_watcher=true
 ```
 
 > 注：内部 ledger/report/secrets 文件保存在任务 project 中；公开文档只记录非敏感 message id、公开 URL、事件类型和动作结果。密码/API key 只保存在本地 `secrets/`，并已做泄露扫描。
+
+
+## 案例：Discourse topic/post 触发 Agent Runs 回帖
+
+| 字段 | 值 |
+| --- | --- |
+| 平台 | Discourse |
+| Category | `Agent Runs` |
+| Actor | `RexWang` / user id `4` / 普通用户 |
+| Actor post | https://discourse.public.lookeng.cn/t/chatrss-discourse-trigger-practice-2026-08-05-0259-utc/18/1 |
+| Reply post | https://discourse.public.lookeng.cn/t/chatrss-discourse-trigger-practice-2026-08-05-0259-utc/18/2 |
+| Trigger marker | `chatrss-discourse-trigger-20260805022954` |
+| Event id | `discourse:post:25:mention:system` |
+| Action | `discourse.post.reply` |
+| Verification | RexWang 登录态回读 topic JSON，确认 post `25` 和 reply `26` 都包含 marker |
+
+### 用户真实发帖
+
+`RexWang` 是本次实践创建并验证的 Discourse 普通用户，账号已通过网页登录接口校验。实践里，`RexWang` 在真实 Discourse `Agent Runs` 分类创建 topic，并在首帖中 @ `system`：
+
+```text
+@system This is a real ChatRSS Discourse trigger practice created by RexWang.
+
+Marker: `chatrss-discourse-trigger-20260805022954`
+
+Task: show how a Discourse topic/post can become a ChatRSS TriggerEvent,
+then route to an agent action.
+```
+
+### 后台执行过程
+
+```text
+Discourse topic/post by RexWang
+  -> discourse.posts watcher reads topic/post metadata and raw/cooked content
+  -> TriggerEvent(source=discourse, connector=discourse.posts, event_type=community.mention.created)
+  -> Router decision: act
+  -> action plan: discourse.post.reply
+  -> action bot writes a real Discourse reply in the same topic
+  -> RexWang login session reads back the topic JSON
+  -> JSONL ledger records the full chain
+```
+
+### 标准事件
+
+```json
+{
+  "source": "discourse",
+  "connector": "discourse.posts",
+  "event_type": "community.mention.created",
+  "event_id": "discourse:post:25:mention:system",
+  "subject": {
+    "kind": "post",
+    "id": 25,
+    "topic_id": 18,
+    "post_number": 1,
+    "category": "Agent Runs",
+    "url": "https://discourse.public.lookeng.cn/t/chatrss-discourse-trigger-practice-2026-08-05-0259-utc/18/1"
+  },
+  "actor": {
+    "kind": "user",
+    "id": 4,
+    "username": "RexWang"
+  },
+  "payload": {
+    "mentions": ["system"],
+    "marker": "chatrss-discourse-trigger-20260805022954"
+  }
+}
+```
+
+### 路由决策与动作
+
+```json
+{
+  "decision": "act",
+  "route": "community.discourse.mention",
+  "model_used": "rule-router + deterministic practice worker",
+  "actions": [
+    "internal.notify",
+    "agent.run",
+    "discourse.post.reply"
+  ]
+}
+```
+
+Action executor 使用 Discourse 自身的 `PostCreator` 写入真实 reply，不是 mock JSON，也不是直接 SQL 插入。回帖账号为 `ark-code-latest1`，reply post 为 `26`。
+
+### Ledger 记录
+
+```text
+actor_topic_created
+event_received
+route_decision
+action_planned: discourse.post.reply
+action_result: sent external_write=true post_id=26
+action_verified: actor_post_exists=true reply_exists=true
+```
+
+> 注：Discourse 站点当前登录后可读；公开文档只记录非敏感 URL、post id、event id、action type 和验证状态，不记录用户密码、session、cookie、API key 或管理员 token。
 
 ## 接入原则
 

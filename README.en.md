@@ -29,7 +29,7 @@ Documentation: <https://arch.gh.wzhecnu.cn/ChatRSS/>
 | Local RSSHub container helper | Implemented, requires local Docker / docker-compose | `chatrss server ...` |
 | Local event log inspection | Implemented | `chatrss cat` |
 | Trigger-Router-Action local flow | Implemented dry-run MVP | `chatrss flow demo` |
-| Real Zulip trigger + reply case | Verified on `zhihong.oray` with actor/watcher/action accounts | [Real-world cases](docs/real-world-cases.en.md) |
+| Real Zulip / Discourse trigger + reply cases | Verified on `zhihong.oray` with real platform accounts | [Real-world cases](docs/real-world-cases.en.md) |
 | Multi-platform trigger / router / action framework | Planned, with schema and dry-run seams already in place | [Capability map](docs/capability-map.en.md) |
 
 ## Quick start

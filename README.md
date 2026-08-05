@@ -29,7 +29,7 @@ ChatRSS 是 ChatArch 的 RSS / RSSHub-first trigger-router-action 工具：RSSHu
 | 本地 RSSHub 容器辅助管理 | 已实现，需要本机 Docker / docker-compose | `chatrss server ...` |
 | 本地事件日志查看 | 已实现 | `chatrss cat` |
 | Trigger-Router-Action 本地闭环 | 已实现 dry-run MVP | `chatrss flow demo` |
-| 真实 Zulip trigger + 回帖案例 | 已在 `zhihong.oray` 用 actor/watcher/action 账号验证 | [真实事件案例](docs/real-world-cases.md) |
+| 真实 Zulip / Discourse trigger + 回帖案例 | 已在 `zhihong.oray` 用真实平台账号验证 | [真实事件案例](docs/real-world-cases.md) |
 | 多平台 trigger / router / action 框架 | 规划中，已有 schema 和 dry-run seam | [能力地图](docs/capability-map.md) |
 
 ## 快速开始
@@ -57,6 +57,7 @@ PYTHONPATH=src python -m chatrss.cli flow demo --ledger ./playground/flow.ledger
 - [接口树](docs/interface-tree.md)：CLI 到 Python API / module 的映射。
 - [Trigger-Router-Action 设计](docs/trigger-router-action.md)：架构和事件协议。
 - [真实平台实践计划](docs/practice-plan.md)：Discourse、Zulip、Revolt、GitHub、Gitea 接入顺序。
+- [真实事件案例](docs/real-world-cases.md)：Zulip 与 Discourse 的真实平台 trigger/action 闭环。
 - [Zulip @mention 快速开始](docs/zulip-quickstart.md)：第一条真实平台 trigger 验证。
 
 ## Minor 版本方向

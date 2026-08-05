@@ -10,10 +10,10 @@ The capability map answers what ChatRSS owns and what it does not own. Invocatio
 | Event Schema | `TriggerEvent` / `ActionJob` / `RouteDecision` implemented | `chatrss.events` | Every connector emits this envelope |
 | Rule Router | Minimal rules implemented | `chatrss.pipeline.route_event` | Configurable YAML/JSON rules before model routing |
 | Model Router | Deterministic stub implemented | `chatrss.pipeline.model_route_event` | LLM JSON decision with schema validation and explanations |
-| Action Planner | Dry-run planning implemented; the real platform case records a `zulip.message.reply` action | `chatrss.pipeline.plan_actions` / [real-world cases](real-world-cases.en.md) | Action outbox with idempotency keys |
-| Action Executor | Package executor is dry-run; the host-side practice verified a Zulip action-bot reply | `chatrss.pipeline.execute_action` / [real-world cases](real-world-cases.en.md) | Feishu/GitHub/Gitea/Zulip/agent adapters |
+| Action Planner | Dry-run planning implemented; real platform cases record `zulip.message.reply` and `discourse.post.reply` actions | `chatrss.pipeline.plan_actions` / [real-world cases](real-world-cases.en.md) | Action outbox with idempotency keys |
+| Action Executor | Package executor is dry-run; host-side practices verified Zulip and Discourse action-bot replies | `chatrss.pipeline.execute_action` / [real-world cases](real-world-cases.en.md) | Feishu/GitHub/Gitea/Zulip/agent adapters |
 | Ledger | JSONL flow ledger implemented | `append_ledger` / `read_ledger` | SQLite/Postgres inbox/outbox/ledger with replay and audit |
-| Real community trigger | Zulip @mention -> worker -> action-bot reply verified | [real-world cases](real-world-cases.en.md) / [Zulip quick start](zulip-quickstart.en.md) | Zulip/Discourse/Revolt connectors |
+| Real community trigger | Zulip @mention and Discourse topic/post -> worker -> action-bot reply verified | [real-world cases](real-world-cases.en.md) / [Zulip quick start](zulip-quickstart.en.md) | Zulip/Discourse/Revolt connectors |
 
 ## Responsibility boundaries
 
@@ -48,5 +48,5 @@ The capability map answers what ChatRSS owns and what it does not own. Invocatio
 | GitHub project progress | RSSHub routes / comments / issue / PR | notify + agent.run + comment draft |
 | Gitea collaboration events | notifications API / issue / PR comments | agent.run + gitea.comment.draft |
 | Zulip community messages | messages/events API + mention flag | agent.run + zulip.message.reply (draft/approval by default, executable when authorized) |
-| Discourse forum | notifications/topics/posts API | agent.run + discourse.reply.draft |
+| Discourse forum | notifications/topics/posts API / posts watcher | agent.run + discourse.post.reply (draft/approval by default, executable when authorized) |
 | Revolt channels | bot token + gateway or REST polling | agent.run + revolt.message.draft |

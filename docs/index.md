@@ -34,7 +34,7 @@ ChatRSS 是 RSS / RSSHub-first 的 Agent 触发器：它把 feed、通知、社�
 
 - **实践**
 
-  以 Zulip 为已验证真实 trigger 和回帖案例，后续扩展到 Discourse、Revolt、GitHub 和 Gitea。
+  以 Zulip 和 Discourse 为已验证真实 trigger/action 案例，后续扩展到 Revolt、GitHub 和 Gitea。
 
 </div>
 

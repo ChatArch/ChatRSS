@@ -34,7 +34,7 @@ Site: <https://arch.gh.wzhecnu.cn/ChatRSS/>
 
 - **Practice**
 
-  Zulip is the verified real trigger and reply case; Discourse, Revolt, GitHub, and Gitea follow the same pattern.
+  Zulip and Discourse are verified real trigger/action cases; Revolt, GitHub, and Gitea follow the same pattern.
 
 </div>
 

@@ -1,6 +1,6 @@
 # Real-World Event Cases
 
-This page records how ChatRSS moves from an abstract trigger-router-action demo to a real platform loop. The important point is that the task starts as a real platform event: a user mentions the watcher on Zulip, ChatRSS captures the event, a worker completes the task, and an action bot replies in the same topic.
+This page records how ChatRSS moves from an abstract trigger-router-action demo to real platform loops. The important point is that the task starts as a real platform event: a user-visible message, topic, post, or mention triggers ChatRSS, a worker completes the task, and an action bot writes back. Zulip @mentions and Discourse topic/posts are now both verified community-platform shapes.
 
 ## Case: Zulip @mention triggers a Codex plan analysis
 
@@ -112,6 +112,105 @@ action_verified: visible_to_watcher=true
 ```
 
 Internal ledgers, reports, and secrets stay in the task project. Public docs record only non-sensitive message ids, public URLs, event types, and action results. Passwords and API keys stay in the host-side `secrets/` directory and were checked for report/playground/script leakage.
+
+
+## Case: Discourse topic/post triggers an Agent Runs reply
+
+| Field | Value |
+| --- | --- |
+| Platform | Discourse |
+| Category | `Agent Runs` |
+| Actor | `RexWang` / user id `4` / ordinary user |
+| Actor post | https://discourse.public.lookeng.cn/t/chatrss-discourse-trigger-practice-2026-08-05-0259-utc/18/1 |
+| Reply post | https://discourse.public.lookeng.cn/t/chatrss-discourse-trigger-practice-2026-08-05-0259-utc/18/2 |
+| Trigger marker | `chatrss-discourse-trigger-20260805022954` |
+| Event id | `discourse:post:25:mention:system` |
+| Action | `discourse.post.reply` |
+| Verification | RexWang's logged-in session read the topic JSON and confirmed post `25` and reply `26` both contain the marker |
+
+### The real user post
+
+`RexWang` is the ordinary Discourse user created and verified for this practice. In the run, `RexWang` created a real topic in the `Agent Runs` category and mentioned `@system` in the first post:
+
+```text
+@system This is a real ChatRSS Discourse trigger practice created by RexWang.
+
+Marker: `chatrss-discourse-trigger-20260805022954`
+
+Task: show how a Discourse topic/post can become a ChatRSS TriggerEvent,
+then route to an agent action.
+```
+
+### Background execution chain
+
+```text
+Discourse topic/post by RexWang
+  -> discourse.posts watcher reads topic/post metadata plus raw/cooked content
+  -> TriggerEvent(source=discourse, connector=discourse.posts, event_type=community.mention.created)
+  -> Router decision: act
+  -> action plan: discourse.post.reply
+  -> action bot writes a real Discourse reply in the same topic
+  -> RexWang login session reads back the topic JSON
+  -> JSONL ledger records the full chain
+```
+
+### Normalized event
+
+```json
+{
+  "source": "discourse",
+  "connector": "discourse.posts",
+  "event_type": "community.mention.created",
+  "event_id": "discourse:post:25:mention:system",
+  "subject": {
+    "kind": "post",
+    "id": 25,
+    "topic_id": 18,
+    "post_number": 1,
+    "category": "Agent Runs",
+    "url": "https://discourse.public.lookeng.cn/t/chatrss-discourse-trigger-practice-2026-08-05-0259-utc/18/1"
+  },
+  "actor": {
+    "kind": "user",
+    "id": 4,
+    "username": "RexWang"
+  },
+  "payload": {
+    "mentions": ["system"],
+    "marker": "chatrss-discourse-trigger-20260805022954"
+  }
+}
+```
+
+### Route decision and action
+
+```json
+{
+  "decision": "act",
+  "route": "community.discourse.mention",
+  "model_used": "rule-router + deterministic practice worker",
+  "actions": [
+    "internal.notify",
+    "agent.run",
+    "discourse.post.reply"
+  ]
+}
+```
+
+The action executor used Discourse's own `PostCreator` to write a real reply. It is not a mock JSON fixture and not a direct SQL insert. The reply account was `ark-code-latest1`, and the reply post id is `26`.
+
+### Ledger records
+
+```text
+actor_topic_created
+event_received
+route_decision
+action_planned: discourse.post.reply
+action_result: sent external_write=true post_id=26
+action_verified: actor_post_exists=true reply_exists=true
+```
+
+Internal Discourse reports keep only non-sensitive evidence. Public docs record URLs, post ids, event ids, action types, and verification status; they do not record passwords, sessions, cookies, API keys, or admin tokens.
 
 ## Connector acceptance contract
 
