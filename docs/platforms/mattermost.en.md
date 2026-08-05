@@ -10,7 +10,7 @@ Mattermost is the most natural realtime chat entry point among the three platfor
 | --- | --- |
 | Platform | Mattermost Team Edition |
 | Public URL | https://matter.public.wzhecnu.cn |
-| Local short alias | `matter.local.wzhecnu.cn` (`matter.local` does not currently resolve) |
+| Local short alias | `<local-service-alias>` (private deployment shortcut; public docs do not record the concrete local-domain alias) |
 | Team / Channel | `agent-lab` / `agent-room` |
 | Actor | `RexWang` (Mattermost username: `rexwang`) |
 | Bot | `hermes-agent` |
@@ -87,25 +87,17 @@ So Mattermost does not need RSSHub, but ChatRSS is useful when Mattermost, Zulip
 }
 ```
 
-## Existing gateway env keys
+## Gateway configuration
 
-The Mattermost service already has a host-local Hermes gateway bot env file:
+Mattermost integration config should live in a protected host-side secret store or ChatEnv profile. Public docs describe configuration categories only; they do not expose real file paths, secret-bearing env key names, or credential values.
 
-```text
-/home/zhihong/.chatarch/mattermost/secrets/bot.env
-```
+Configuration categories:
 
-Public docs list keys only, never values:
-
-```text
-MATTERMOST_URL
-MATTERMOST_TOKEN
-MATTERMOST_BOT_USERNAME
-MATTERMOST_ALLOWED_USERS
-MATTERMOST_HOME_CHANNEL
-MATTERMOST_REPLY_MODE
-MATTERMOST_REQUIRE_MENTION
-```
+- Mattermost public/base URL
+- Bot authentication credential
+- Bot username / allowed-actor policy
+- Home channel and reply mode
+- Mention-required safety switch
 
 ## Recommended usage
 

@@ -4,7 +4,7 @@
 
 ## 已验证对象
 
-Host：`zhihong.oray`
+环境：受控 Zulip 服务环境（公开入口 + 私有凭据存储）
 
 平台：
 
@@ -16,9 +16,9 @@ Host：`zhihong.oray`
 
 | account | role |
 | --- | --- |
-| `chatrss-actor@chatarch.local` | 发送测试消息。 |
-| `chatrss-watcher@chatarch.local` / `ChatRSS Watcher Bot` | ChatRSS 托管 watcher；轮询 Zulip 并检测 mention。 |
-| `chatrss-agent@chatarch.local` / `ChatRSS Agent Bot` | 真实回帖案例中的 action account；默认不启用外部写动作。 |
+| `watcher@example.invalid` | 发送测试消息。 |
+| `watcher@example.invalid` / `ChatRSS Watcher Bot` | ChatRSS 托管 watcher；轮询 Zulip 并检测 mention。 |
+| `watcher@example.invalid` / `ChatRSS Agent Bot` | 真实回帖案例中的 action account；默认不启用外部写动作。 |
 
 watcher credential 和 API key 只保存在 host 上 task-local secrets 文件，权限为 `0600`；仓库中不保存 password 或 API key。
 
@@ -51,7 +51,7 @@ mention_flag: true
   "source": "zulip",
   "connector": "zulip.messages",
   "event_type": "community.mention.created",
-  "event_id": "zulip:message:16:mention:chatrss-watcher@chatarch.local",
+  "event_id": "zulip:message:16:mention:watcher@example.invalid",
   "subject": {
     "type": "zulip.message",
     "stream": "chatrss-quickstart",
@@ -88,16 +88,9 @@ mention_flag: true
 | `agent.run` | `DRY_RUN_OK` | false |
 | `zulip.message.draft` | `DRY_RUN_OK` | false |
 
-## Host 产物
+## 验证产物
 
-在 `zhihong.oray`：
-
-```text
-/home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/scripts/zulip_trigger_quickstart.py
-/home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/reports/zulip-quickstart.md
-/home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/reports/zulip-quickstart-result.json
-/home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/playground/zulip-mention.ledger.jsonl
-```
+验证脚本、ledger、JSON 结果和报告保存在私有任务 project 中。公开文档只保留非敏感的 message id、event id、action type 和流程摘要；不记录主机名、home path、凭据文件路径或 secret key 名。
 
 后续进入 ChatRSS 的可复用目标是 `zulip.messages` connector，对应 trigger job：
 
@@ -130,7 +123,7 @@ Quick start 的最小验收可以停在 `dry-run` / `draft` action；已验证�
 | --- | --- |
 | Actor message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/20 |
 | Reply message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/21 |
-| Event id | `zulip:message:20:mention:chatrss-watcher@chatarch.local` |
+| Event id | `zulip:message:20:mention:watcher@example.invalid` |
 | Action result | `SENT external_write=true message_id=21` |
 
 这次 actor 提出的任务是让 worker 分析 OpenAI Codex 在普通账号、ChatGPT Plus、ChatGPT Pro 三种 coding 使用方案上的差异。ChatRSS 捕获 mention、路由为 `act`、执行资料核对 worker，然后由 action bot 把结果回帖到同一个 Zulip topic。完整事件、标准事件 envelope、路由决策和 ledger 顺序见 [真实事件案例](real-world-cases.md)。

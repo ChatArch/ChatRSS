@@ -1,6 +1,6 @@
 # ChatRSS 真实平台实践计划
 
-目标：用现有社区和代码托管平台跑通真实 trigger，而不是只停留在抽象 demo。第一批实践来源包括 `zhihong.oray` 上的 Zulip、Discourse、Mattermost、Revolt，以及 GitHub/Gitea 项目进展。
+目标：用现有社区和代码托管平台跑通真实 trigger，而不是只停留在抽象 demo。第一批实践来源包括 受控服务环境 上的 Zulip、Discourse、Mattermost、Revolt，以及 GitHub/Gitea 项目进展。
 
 ## 已验证平台入口
 

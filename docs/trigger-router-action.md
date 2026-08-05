@@ -140,7 +140,7 @@ MVP 用 JSONL ledger，记录：
 
 ### 社区对话来源
 
-`zhihong.oray` 上已有 Discourse、Zulip、Revolt 等社区/对话服务，可以作为 ChatRSS 触发器的实践环境。当前先不急着做全平台 adapter，而是定义每个平台最小信号：
+受控服务环境已有 Discourse、Zulip、Revolt 等社区/对话服务，可以作为 ChatRSS 触发器的实践环境。当前先不急着做全平台 adapter，而是定义每个平台最小信号：
 
 | 平台 | 第一信号 | Trigger 目标 |
 | --- | --- | --- |

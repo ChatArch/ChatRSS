@@ -16,7 +16,7 @@ The Zulip case proves the event-first model: **a user performs a pre-action in t
 | Action bot | `ChatRSS Agent Bot` |
 | Trigger message | https://zulip.public.lookeng.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/24 |
 | Reply message | https://zulip.public.lookeng.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/25 |
-| Event id | `zulip:message:24:mention:chatrss-watcher@chatarch.local` |
+| Event id | `zulip:message:24:mention:watcher@example.invalid` |
 | Action | `zulip.message.reply` |
 | Evidence screenshot | `docs/assets/platform-cases/zulip-rexwang-conversation.png` |
 
@@ -41,7 +41,7 @@ The **pre-action** is `RexWang @ ChatRSS Watcher Bot`. The task intent comes fro
   "source": "zulip",
   "connector": "zulip.messages",
   "event_type": "community.mention.created",
-  "event_id": "zulip:message:24:mention:chatrss-watcher@chatarch.local",
+  "event_id": "zulip:message:24:mention:watcher@example.invalid",
   "actor": {
     "type": "zulip_user",
     "display_name": "RexWang"

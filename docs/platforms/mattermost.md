@@ -10,7 +10,7 @@ Mattermost 是这三个平台里最适合“直接拉 Agent 进去”的实时�
 | --- | --- |
 | 平台 | Mattermost Team Edition |
 | Public URL | https://matter.public.wzhecnu.cn |
-| Local short alias | `matter.local.wzhecnu.cn`（裸 `matter.local` 当前不解析） |
+| Local short alias | `<local-service-alias>`（私有部署快捷入口；公开文档不记录具体本地域名） |
 | Team / Channel | `agent-lab` / `agent-room` |
 | Actor | `RexWang`（Mattermost username: `rexwang`） |
 | Bot | `hermes-agent` |
@@ -87,25 +87,17 @@ Mattermost post/webhook/WebSocket event
 }
 ```
 
-## 当前部署已准备好的接入键
+## 当前接入配置
 
-Mattermost 服务侧已经准备过 Hermes gateway 的 bot env，路径是：
+Mattermost 接入配置应保存在主机侧受保护的 secret store 或 ChatEnv profile 中。公开文档只描述配置类别，不列真实文件路径、secret-bearing env key 名或任何 credential 值。
 
-```text
-/home/zhihong/.chatarch/mattermost/secrets/bot.env
-```
+配置类别：
 
-公开文档只列键名，不列值：
-
-```text
-MATTERMOST_URL
-MATTERMOST_TOKEN
-MATTERMOST_BOT_USERNAME
-MATTERMOST_ALLOWED_USERS
-MATTERMOST_HOME_CHANNEL
-MATTERMOST_REPLY_MODE
-MATTERMOST_REQUIRE_MENTION
-```
+- Mattermost public/base URL
+- Bot authentication credential
+- Bot username / allowed actor policy
+- Home channel and reply mode
+- Mention-required safety switch
 
 ## 推荐用法
 

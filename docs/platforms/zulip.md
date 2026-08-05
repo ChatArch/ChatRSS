@@ -16,7 +16,7 @@ Zulip 案例用于证明：**用户先在聊天平台做一个前置动作，然
 | Action bot | `ChatRSS Agent Bot` |
 | Trigger message | https://zulip.public.lookeng.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/24 |
 | Reply message | https://zulip.public.lookeng.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/25 |
-| Event id | `zulip:message:24:mention:chatrss-watcher@chatarch.local` |
+| Event id | `zulip:message:24:mention:watcher@example.invalid` |
 | Action | `zulip.message.reply` |
 | Evidence screenshot | `docs/assets/platform-cases/zulip-rexwang-conversation.png` |
 
@@ -41,7 +41,7 @@ RexWang 在 Zulip stream/topic 中 @ ChatRSS Watcher Bot
   "source": "zulip",
   "connector": "zulip.messages",
   "event_type": "community.mention.created",
-  "event_id": "zulip:message:24:mention:chatrss-watcher@chatarch.local",
+  "event_id": "zulip:message:24:mention:watcher@example.invalid",
   "actor": {
     "type": "zulip_user",
     "display_name": "RexWang"

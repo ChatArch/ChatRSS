@@ -4,7 +4,7 @@ This quick start verifies a real Zulip trigger for ChatRSS: one Zulip account se
 
 ## What was verified
 
-Host: `zhihong.oray`
+Environment: controlled Zulip service environment with public entry and private credential storage
 
 Platform:
 
@@ -16,9 +16,9 @@ Accounts:
 
 | account | role |
 | --- | --- |
-| `chatrss-actor@chatarch.local` | Sends the test message. |
-| `chatrss-watcher@chatarch.local` / `ChatRSS Watcher Bot` | ChatRSS-managed watcher; polls Zulip and detects mentions. |
-| `chatrss-agent@chatarch.local` / `ChatRSS Agent Bot` | Action account used in the real reply case; external writes are not enabled by default. |
+| `watcher@example.invalid` | Sends the test message. |
+| `watcher@example.invalid` / `ChatRSS Watcher Bot` | ChatRSS-managed watcher; polls Zulip and detects mentions. |
+| `watcher@example.invalid` / `ChatRSS Agent Bot` | Action account used in the real reply case; external writes are not enabled by default. |
 
 The watcher credentials and API key are stored only in the task-local secrets file on the host with mode `0600`; no password or API key is stored in this repository.
 
@@ -51,7 +51,7 @@ mention_flag: true
   "source": "zulip",
   "connector": "zulip.messages",
   "event_type": "community.mention.created",
-  "event_id": "zulip:message:16:mention:chatrss-watcher@chatarch.local",
+  "event_id": "zulip:message:16:mention:watcher@example.invalid",
   "subject": {
     "type": "zulip.message",
     "stream": "chatrss-quickstart",
@@ -88,16 +88,9 @@ All actions were dry-run/draft only:
 | `agent.run` | `DRY_RUN_OK` | false |
 | `zulip.message.draft` | `DRY_RUN_OK` | false |
 
-## Host artifacts
+## Validation artifacts
 
-On `zhihong.oray`:
-
-```text
-/home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/scripts/zulip_trigger_quickstart.py
-/home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/reports/zulip-quickstart.md
-/home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/reports/zulip-quickstart-result.json
-/home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/playground/zulip-mention.ledger.jsonl
-```
+The validation script, ledger, JSON result, and report stay in a private task project. Public docs retain only non-sensitive message ids, event ids, action types, and workflow summaries; they do not expose hostnames, home paths, credential-file paths, or secret key names.
 
 The reusable implementation target for ChatRSS is a future `zulip.messages` connector backed by a trigger job like:
 
@@ -130,7 +123,7 @@ The minimum quick-start acceptance can stop at `dry-run` / `draft` actions. The 
 | --- | --- |
 | Actor message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/20 |
 | Reply message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/21 |
-| Event id | `zulip:message:20:mention:chatrss-watcher@chatarch.local` |
+| Event id | `zulip:message:20:mention:watcher@example.invalid` |
 | Action result | `SENT external_write=true message_id=21` |
 
 The actor asked a worker to analyze OpenAI Codex differences across a regular account, ChatGPT Plus, and ChatGPT Pro for coding usage. ChatRSS captured the mention, routed it to `act`, ran a bounded research worker, and used the action bot to reply in the same Zulip topic. The normalized event, route decision, and ledger order are documented in [real-world cases](real-world-cases.en.md).
