@@ -10,10 +10,10 @@
 | Event Schema | 已实现 `TriggerEvent` / `ActionJob` / `RouteDecision` | `chatrss.events` | 所有 connector 统一输出这个 envelope |
 | Rule Router | 已实现最小规则 | `chatrss.pipeline.route_event` | 可配置 YAML/JSON rules，先降噪再进模型 |
 | Model Router | 已实现 deterministic stub | `chatrss.pipeline.model_route_event` | LLM JSON decision，保留 schema 校验和解释 |
-| Action Planner | 已实现 dry-run plan | `chatrss.pipeline.plan_actions` | 输出 action outbox，带 idempotency key |
-| Action Executor | 已实现 dry-run executor | `chatrss.pipeline.execute_action` | Feishu/GitHub/Gitea/Zulip/agent adapters |
+| Action Planner | 已实现 dry-run plan；真实平台案例已记录 `zulip.message.reply` action | `chatrss.pipeline.plan_actions` / [真实事件案例](real-world-cases.md) | 输出 action outbox，带 idempotency key |
+| Action Executor | 包内已实现 dry-run executor；远端实践验证 Zulip action bot 回帖 | `chatrss.pipeline.execute_action` / [真实事件案例](real-world-cases.md) | Feishu/GitHub/Gitea/Zulip/agent adapters |
 | Ledger | 已实现 JSONL flow ledger | `chatrss.pipeline.append_ledger` / `read_ledger` | SQLite/Postgres inbox/outbox/ledger，可重放和审计 |
-| 真实社区 trigger | 已验证 Zulip @mention quick start | 文档和远端实践脚本 | Zulip/Discourse/Revolt connector |
+| 真实社区 trigger | 已验证 Zulip @mention -> worker -> action bot 回帖 | [真实事件案例](real-world-cases.md) / [Zulip quick start](zulip-quickstart.md) | Zulip/Discourse/Revolt connector |
 
 ## 责任边界
 
@@ -39,7 +39,7 @@
 - 不让 trigger connector 直接发消息、评论、merge、发布或改配置。
 - 不把规划命令做成返回成功的 CLI 空壳。
 - 不在 ledger、报告、README 或文档中保存 token、password、API key。
-- 不默认执行真实外部写动作；写动作必须 dry-run/draft/approval 分层。
+- 不默认执行真实外部写动作；写动作必须 dry-run/draft/approval 分层，只有明确授权的案例才执行并验证。
 
 ## 平台扩展优先级
 
@@ -47,6 +47,6 @@
 | --- | --- | --- |
 | GitHub 项目进展 | RSSHub routes / comments / issue / PR | notify + agent.run + comment draft |
 | Gitea 协作事件 | notifications API / issue / PR comments | agent.run + gitea.comment.draft |
-| Zulip 社区消息 | messages/events API + mention flag | agent.run + zulip.message.draft |
+| Zulip 社区消息 | messages/events API + mention flag | agent.run + zulip.message.reply（默认 draft/approval，可授权执行） |
 | Discourse 论坛 | notifications/topics/posts API | agent.run + discourse.reply.draft |
 | Revolt 频道 | bot token + gateway 或 REST polling | agent.run + revolt.message.draft |

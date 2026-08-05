@@ -1,6 +1,6 @@
 # Zulip @mention Quick Start
 
-This quick start verifies the first real platform trigger for ChatRSS: one Zulip account sends a message mentioning a ChatRSS-managed watcher account; the watcher account polls Zulip with its own API key; ChatRSS normalizes the mention into an event, routes it, plans dry-run actions, and writes a ledger.
+This quick start verifies a real Zulip trigger for ChatRSS: one Zulip account sends a message mentioning a ChatRSS-managed watcher account; the watcher account polls Zulip with its own API key; ChatRSS normalizes the mention into an event, routes it, plans actions, and writes a ledger. The complete actor -> watcher -> worker -> action-bot reply case is documented in [real-world cases](real-world-cases.en.md).
 
 ## What was verified
 
@@ -18,6 +18,7 @@ Accounts:
 | --- | --- |
 | `chatrss-actor@chatarch.local` | Sends the test message. |
 | `chatrss-watcher@chatarch.local` / `ChatRSS Watcher Bot` | ChatRSS-managed watcher; polls Zulip and detects mentions. |
+| `chatrss-agent@chatarch.local` / `ChatRSS Agent Bot` | Action account used in the real reply case; external writes are not enabled by default. |
 
 The watcher credentials and API key are stored only in the task-local secrets file on the host with mode `0600`; no password or API key is stored in this repository.
 
@@ -119,3 +120,17 @@ actions:
   - agent.run
   - zulip.message.draft
 ```
+
+
+## Complete real reply case
+
+The minimum quick-start acceptance can stop at `dry-run` / `draft` actions. The verified full case went further and executed a real reply:
+
+| Field | Value |
+| --- | --- |
+| Actor message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/20 |
+| Reply message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/21 |
+| Event id | `zulip:message:20:mention:chatrss-watcher@chatarch.local` |
+| Action result | `SENT external_write=true message_id=21` |
+
+The actor asked a worker to analyze OpenAI Codex differences across a regular account, ChatGPT Plus, and ChatGPT Pro for coding usage. ChatRSS captured the mention, routed it to `act`, ran a bounded research worker, and used the action bot to reply in the same Zulip topic. The normalized event, route decision, and ledger order are documented in [real-world cases](real-world-cases.en.md).

@@ -9,9 +9,9 @@
 3. **账号隔离**：至少区分：
    - `actor account`：用于发帖、评论、@mention，模拟真实用户或模型。
    - `watcher account`：由 ChatRSS 托管，专门接收 mention/通知/消息。
-   - `action account`：需要真实回复/留言时才启用；MVP 先只 dry-run。
+   - `action account`：需要真实回复/留言时才启用；默认 dry-run/draft，明确授权后可执行并验证。
 4. **Trigger 不直接执行动作**：trigger 捕获信号后只产出标准 Event，后续由 router/model/action 处理。
-5. **外部写动作默认 dry-run / draft**：真实回复、发帖、评论必须进入审批或单独授权。
+5. **外部写动作默认 dry-run / draft**：真实回复、发帖、评论必须进入审批或单独授权；已验证 Zulip 授权回帖案例见 [真实事件案例](real-world-cases.md)。
 
 ## 2. 平台和第一批 trigger 定义
 
@@ -74,7 +74,7 @@
 | --- | --- |
 | `zulip-actor` | 在指定 stream/topic 发消息或 @ watcher。 |
 | `zulip-watcher-bot` | ChatRSS 托管 bot，轮询 events 或 messages。 |
-| `zulip-action-bot` | 后续真实回复 bot；MVP 先 dry-run。 |
+| `zulip-action-bot` | 真实回复 bot；默认 dry-run/draft，授权案例中执行 `zulip.message.reply`。 |
 
 优先入口：
 
@@ -97,7 +97,8 @@
     max_messages: 50
   actions:
     - agent.run
-    - zulip.message.draft
+    - zulip.message.draft  # default
+    - zulip.message.reply   # authorized case only
 ```
 
 ### 2.3 Revolt
@@ -277,8 +278,8 @@ route_to: router.default
 1. 建 actor + watcher/bot。
 2. 在指定空间发一条含 @ watcher 的消息。
 3. watcher connector 捕获消息。
-4. Router 输出 `agent.run` + draft reply action。
-5. Ledger 记录完整链路。
+4. Router 输出 `agent.run` + draft reply action；如果已授权，可执行平台 reply action。
+5. Ledger 记录完整链路，并在执行写动作时追加 `action_verified`。
 
 ### 三个社区平台补齐
 
@@ -300,5 +301,6 @@ route_to: router.default
 2. watcher 账号/token 能收到或轮询到这个信号；
 3. ChatRSS 标准化出 TriggerEvent；
 4. Router 明确说明为什么 act/archive/ignore；
-5. Action Planner 产生 dry-run/draft action；
-6. Ledger 可回读完整因果链。
+5. Action Planner 产生 dry-run/draft action，或在明确授权后产生可执行 action；
+6. Executor 写回平台后可由 watcher 回读验证；
+7. Ledger 可回读完整因果链。

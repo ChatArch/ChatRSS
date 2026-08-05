@@ -1,6 +1,6 @@
 # Zulip @mention 快速开始
 
-这条 quick start 验证了 ChatRSS 的第一条真实平台 trigger：一个 Zulip 账号发送消息并 @ ChatRSS 托管的 watcher 账号；watcher 账号用自己的 API key 轮询 Zulip；ChatRSS 把 mention 标准化为 Event，进入 router，规划 dry-run action，并写入 ledger。
+这条 quick start 验证了 ChatRSS 的真实 Zulip trigger：一个 Zulip 账号发送消息并 @ ChatRSS 托管的 watcher 账号；watcher 账号用自己的 API key 轮询 Zulip；ChatRSS 把 mention 标准化为 Event，进入 router，规划 action，并写入 ledger。完整的 actor -> watcher -> worker -> action bot 回帖案例见 [真实事件案例](real-world-cases.md)。
 
 ## 已验证对象
 
@@ -18,6 +18,7 @@ Host：`zhihong.oray`
 | --- | --- |
 | `chatrss-actor@chatarch.local` | 发送测试消息。 |
 | `chatrss-watcher@chatarch.local` / `ChatRSS Watcher Bot` | ChatRSS 托管 watcher；轮询 Zulip 并检测 mention。 |
+| `chatrss-agent@chatarch.local` / `ChatRSS Agent Bot` | 真实回帖案例中的 action account；默认不启用外部写动作。 |
 
 watcher credential 和 API key 只保存在 host 上 task-local secrets 文件，权限为 `0600`；仓库中不保存 password 或 API key。
 
@@ -119,3 +120,17 @@ actions:
   - agent.run
   - zulip.message.draft
 ```
+
+
+## 完整真实回帖案例
+
+Quick start 的最小验收可以停在 `dry-run` / `draft` action；已验证的完整案例进一步执行了真实回帖：
+
+| 字段 | 值 |
+| --- | --- |
+| Actor message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/20 |
+| Reply message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/21 |
+| Event id | `zulip:message:20:mention:chatrss-watcher@chatarch.local` |
+| Action result | `SENT external_write=true message_id=21` |
+
+这次 actor 提出的任务是让 worker 分析 OpenAI Codex 在普通账号、ChatGPT Plus、ChatGPT Pro 三种 coding 使用方案上的差异。ChatRSS 捕获 mention、路由为 `act`、执行资料核对 worker，然后由 action bot 把结果回帖到同一个 Zulip topic。完整事件、标准事件 envelope、路由决策和 ledger 顺序见 [真实事件案例](real-world-cases.md)。

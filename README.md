@@ -29,6 +29,7 @@ ChatRSS 是 ChatArch 的 RSS / RSSHub-first trigger-router-action 工具：RSSHu
 | 本地 RSSHub 容器辅助管理 | 已实现，需要本机 Docker / docker-compose | `chatrss server ...` |
 | 本地事件日志查看 | 已实现 | `chatrss cat` |
 | Trigger-Router-Action 本地闭环 | 已实现 dry-run MVP | `chatrss flow demo` |
+| 真实 Zulip trigger + 回帖案例 | 已在 `zhihong.oray` 用 actor/watcher/action 账号验证 | [真实事件案例](docs/real-world-cases.md) |
 | 多平台 trigger / router / action 框架 | 规划中，已有 schema 和 dry-run seam | [能力地图](docs/capability-map.md) |
 
 ## 快速开始

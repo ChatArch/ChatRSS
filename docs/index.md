@@ -14,7 +14,7 @@ ChatRSS 是 RSS / RSSHub-first 的 Agent 触发器：它把 feed、通知、社�
 | 我想把 CLI 和 Python API 对上 | [接口树](interface-tree.md) |
 | 我想理解 Trigger / Schema / Router / Model / Action / Ledger 抽象 | [Trigger-Router-Action 设计](trigger-router-action.md) |
 | 我想选真实平台做 trigger 实践 | [真实平台实践计划](practice-plan.md) |
-| 我想复查第一条真实平台链路 | [Zulip @mention 快速开始](zulip-quickstart.md) |
+| 我想复查真实平台链路 | [真实事件案例](real-world-cases.md) / [Zulip @mention 快速开始](zulip-quickstart.md) |
 
 ## 文档栏目组织
 
@@ -34,7 +34,7 @@ ChatRSS 是 RSS / RSSHub-first 的 Agent 触发器：它把 feed、通知、社�
 
 - **实践**
 
-  以 Zulip 为首个真实 trigger，后续扩展到 Discourse、Revolt、GitHub 和 Gitea。
+  以 Zulip 为已验证真实 trigger 和回帖案例，后续扩展到 Discourse、Revolt、GitHub 和 Gitea。
 
 </div>
 

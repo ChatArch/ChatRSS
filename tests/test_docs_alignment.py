@@ -31,6 +31,7 @@ def test_mkdocs_nav_exposes_chatarch_docs_surfaces():
         "interface-tree.md",
         "trigger-router-action.md",
         "practice-plan.md",
+        "real-world-cases.md",
         "zulip-quickstart.md",
     ]:
         assert page in text
@@ -55,3 +56,29 @@ def test_chinese_default_zulip_page_has_english_mirror():
     assert "# Zulip @mention Quick Start" in en
     assert "API key" in zh
     assert "API key" in en
+
+
+def test_real_world_case_documents_complete_zulip_reply_loop():
+    zh = _read("docs/real-world-cases.md")
+    en = _read("docs/real-world-cases.en.md")
+    nav = _read("mkdocs.yml")
+
+    for text in [zh, en]:
+        assert "codex-plan-20260805012352" in text
+        assert "zulip:message:20:mention:chatrss-watcher@chatarch.local" in text
+        assert "zulip.message.reply" in text
+        assert "action_verified" in text
+        assert "message_id=21" in text
+        assert "API key" in text
+    assert "real-world-cases.md" in nav
+    assert "Real-World Event Cases" in nav
+
+
+def test_zulip_quickstart_links_to_complete_case():
+    zh = _read("docs/zulip-quickstart.md")
+    en = _read("docs/zulip-quickstart.en.md")
+
+    assert "真实事件案例" in zh
+    assert "real-world cases" in en
+    assert "near/21" in zh
+    assert "near/21" in en

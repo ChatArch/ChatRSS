@@ -14,7 +14,7 @@ Site: <https://arch.gh.wzhecnu.cn/ChatRSS/>
 | Map CLI commands to Python APIs | [Interface tree](interface-tree.en.md) |
 | Understand Trigger / Schema / Router / Model / Action / Ledger | [Trigger-Router-Action design](trigger-router-action.md) |
 | Pick a real platform trigger practice | [Real platform practice plan](practice-plan.md) |
-| Review the first real platform trigger | [Zulip @mention quick start](zulip-quickstart.en.md) |
+| Review a real platform loop | [Real-world cases](real-world-cases.en.md) / [Zulip @mention quick start](zulip-quickstart.en.md) |
 
 ## Documentation sections
 
@@ -34,7 +34,7 @@ Site: <https://arch.gh.wzhecnu.cn/ChatRSS/>
 
 - **Practice**
 
-  Zulip is the first real trigger; Discourse, Revolt, GitHub, and Gitea follow the same pattern.
+  Zulip is the verified real trigger and reply case; Discourse, Revolt, GitHub, and Gitea follow the same pattern.
 
 </div>
 
