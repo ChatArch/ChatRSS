@@ -126,3 +126,15 @@ def test_zulip_quickstart_links_to_complete_case():
     assert "real-world cases" in en
     assert "near/21" in zh
     assert "near/21" in en
+
+
+def test_readme_lists_all_verified_real_platform_cases():
+    zh = _read("README.md")
+    en = _read("README.en.md")
+
+    assert "真实 Zulip / Discourse / Mattermost trigger + 回帖案例" in zh
+    assert "Zulip、Discourse、Mattermost 的真实平台 trigger/action 闭环" in zh
+    assert "Zulip、Discourse、Mattermost、Revolt、GitHub、Gitea 接入顺序" in zh
+    assert "Real Zulip / Discourse / Mattermost trigger + reply cases" in en
+    assert "Zulip, Discourse, and Mattermost actor -> watcher -> worker -> action-bot loops" in en
+    assert "Zulip, Discourse, Mattermost, Revolt, GitHub, and Gitea sequence" in en

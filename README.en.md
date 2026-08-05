@@ -57,7 +57,7 @@ PYTHONPATH=src python -m chatrss.cli flow demo --ledger ./playground/flow.ledger
 - [Interface tree](docs/interface-tree.en.md): CLI-to-Python API/module mapping.
 - [Trigger-Router-Action design](docs/trigger-router-action.md): architecture and event protocol.
 - [Real platform practice plan](docs/practice-plan.md): Zulip, Discourse, Mattermost, Revolt, GitHub, and Gitea sequence.
-- [Real-world cases](docs/real-world-cases.en.md): verified actor -> watcher -> worker -> action-bot loops.
+- [Real-world cases](docs/real-world-cases.en.md): verified Zulip, Discourse, and Mattermost actor -> watcher -> worker -> action-bot loops.
 - [Zulip @mention quick start](docs/zulip-quickstart.en.md): Zulip trigger setup and verification.
 
 ## Minor-version direction
