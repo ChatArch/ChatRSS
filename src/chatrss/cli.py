@@ -5,10 +5,12 @@ from __future__ import annotations
 import json
 import sys
 import time
+from pathlib import Path
 
 import click
 from chatstyle import render_success, render_warning
 
+from chatrss import __version__
 from chatrss.config import ChatRssConfig
 
 
@@ -36,6 +38,7 @@ def _resolve_rsshub(rsshub_url: str | None) -> str:
 
 
 @click.group()
+@click.version_option(__version__, prog_name="chatrss")
 def main() -> None:
     """chatrss — RSSHub feed 监听 + 飞书联动。"""
 
@@ -229,6 +232,41 @@ def cmd_cat(repo: str | None, limit: int, json_output: bool) -> None:
     for ev in recent:
         click.echo(f"  [{ev.get('source')}] {ev.get('title','')[:60]}")
         click.echo(f"    {ev.get('pub_date','')} | {ev.get('link','')}")
+
+
+# ── flow：trigger-router-action MVP ───────────────────────────────────────────
+
+@main.group("flow")
+def flow_group() -> None:
+    """运行 trigger-router-action 本地闭环。"""
+
+
+@flow_group.command("demo")
+@click.option(
+    "--ledger",
+    type=click.Path(path_type=Path, dir_okay=False, writable=True),
+    default=None,
+    help="JSONL ledger 输出路径；默认写到 CHATARCH_HOME/chatrss/flow-demo.ledger.jsonl",
+)
+@click.option("--json-output", is_flag=True, help="输出完整 JSON 结果。")
+def flow_demo(ledger: Path | None, json_output: bool) -> None:
+    """用内置示例事件跑通 trigger -> router -> action -> ledger。"""
+    from chatrss.pipeline import default_ledger_path, run_event_flow, sample_multi_agent_event
+
+    ledger_path = ledger or default_ledger_path("flow-demo")
+    result = run_event_flow(sample_multi_agent_event(), ledger_path, dry_run=True)
+    if json_output:
+        click.echo(json.dumps(result, ensure_ascii=False, indent=2))
+        return
+
+    click.echo("Trigger-Router-Action demo completed")
+    click.echo(f"  event:    {result['event']['event_id']}")
+    click.echo(f"  decision: {result['decision']['decision']} — {result['decision']['reason']}")
+    click.echo(f"  actions:  {len(result['actions'])}")
+    for action in result["actions"]:
+        approval = " approval-required" if action.get("requires_approval") else ""
+        click.echo(f"    - {action['type']} ({action['mode']}){approval}")
+    click.echo(f"  ledger:   {result['ledger']}")
 
 
 @main.command("ps")

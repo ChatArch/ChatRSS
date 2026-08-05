@@ -5,22 +5,28 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "chatrss"
 dynamic = ["version"]
-description = "chatrss package"
+description = "RSS/RSSHub-first trigger-router-action framework for ChatArch agents"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 dependencies = [
     "click>=8.0",
-    "chatstyle>=0.1.0",
-    "chatenv>=0.1.1",
+    "chatstyle>=0.1.1,<0.2.0",
+    "chatenv>=0.2.3,<0.3.0",
     "httpx>=0.25.0",
     "python-dateutil>=2.8",
 ]
-keywords = ["chatrss", "chatarch", "cli"]
+keywords = ["chatrss", "chatarch", "rss", "rsshub", "agent", "trigger", "cli"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
+
+[project.urls]
+Homepage = "https://github.com/ChatArch/ChatRSS"
+Documentation = "https://arch.gh.wzhecnu.cn/ChatRSS/"
+Repository = "https://github.com/ChatArch/ChatRSS.git"
+Issues = "https://github.com/ChatArch/ChatRSS/issues"
 
 [project.scripts]
 chatrss = "chatrss.cli:main"
@@ -30,7 +36,12 @@ chatrss = "chatrss.config"
 
 [project.optional-dependencies]
 dev = ["build", "pytest", "twine"]
-docs = ["mkdocs>=1.4.0", "mkdocs-material>=9.0.0", "mike>=2.0.0"]
+docs = [
+    "mkdocs>=1.6,<2.0",
+    "mkdocs-material>=9.5,<10.0",
+    "mkdocs-static-i18n>=1.2,<2.0",
+    "mike>=2.0,<3.0",
+]
 
 [tool.setuptools.dynamic]
 version = {attr = "chatrss.__version__"}

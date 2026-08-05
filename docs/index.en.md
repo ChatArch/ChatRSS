@@ -1,12 +1,53 @@
-# chatrss Docs
+# ChatRSS Documentation
 
-Long-lived documentation for `chatrss` lives here.
+ChatRSS is an RSS / RSSHub-first agent trigger tool. It normalizes feeds, notifications, community messages, and code-hosting events into Events, then routes them through Router, Model, Action, and Ledger stages.
 
-## Local Preview
+Site: <https://arch.gh.wzhecnu.cn/ChatRSS/>
+
+## Choose by scenario
+
+| Scenario | Documentation |
+| --- | --- |
+| Run the local flow quickly | [Quick start](quickstart.en.md) |
+| Inspect current and target commands | [CLI tree](cli-tree.en.md) |
+| Check what ChatRSS owns | [Capability map](capability-map.en.md) |
+| Map CLI commands to Python APIs | [Interface tree](interface-tree.en.md) |
+| Understand Trigger / Schema / Router / Model / Action / Ledger | [Trigger-Router-Action design](trigger-router-action.md) |
+| Pick a real platform trigger practice | [Real platform practice plan](practice-plan.md) |
+| Review a real platform loop | [Real-world cases](real-world-cases.en.md) / [Zulip](platforms/zulip.en.md) / [Discourse](platforms/discourse.en.md) / [Mattermost](platforms/mattermost.en.md) / [Zulip @mention quick start](zulip-quickstart.en.md) |
+
+## Documentation sections
+
+<div class="grid cards" markdown>
+
+- **Getting started**
+
+  Install locally, run `flow demo`, inspect RSSHub feed watching, and understand the RSSHub server boundary.
+
+- **Commands and interfaces**
+
+  ChatTea-style CLI tree, target minor-version tree, capability map, and Python interface mapping.
+
+- **Architecture**
+
+  Durable `Trigger -> Event Schema -> Router -> Model -> Action -> Ledger` abstraction.
+
+- **Practice**
+
+  Zulip, Discourse, and Mattermost are verified real trigger/action cases. Mattermost should use the direct gateway for realtime agent rooms; ChatRSS is the optional shared router/ledger layer.
+
+</div>
+
+## Current safety defaults
+
+- Triggers discover and normalize events; they do not execute external actions directly.
+- `repo_event` is archived as background context by default.
+- External writes default to `dry_run`, `draft`, or `approval_required`.
+- Ledgers record events, decisions, actions, and results, not tokens, passwords, or API keys.
+
+## Local preview
 
 ```bash
-pip install -e ".[docs]"
+python -m pip install -e ".[docs]"
 mkdocs serve
 ```
-
-Chinese version: [index.md](index.md).

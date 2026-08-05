@@ -1,4 +1,6 @@
 from click.testing import CliRunner
+import json
+
 from chatrss.cli import main
 
 
@@ -8,6 +10,13 @@ def test_main_help():
     assert "init" in r.output
     assert "watch" in r.output
     assert "cat" in r.output
+    assert "flow" in r.output
+
+
+def test_version_option():
+    r = CliRunner().invoke(main, ["--version"])
+    assert r.exit_code == 0
+    assert "chatrss, version 0.1.0" in r.output
 
 
 def test_init_help():
@@ -20,3 +29,19 @@ def test_watch_help():
     assert r.exit_code == 0
     assert "--rsshub-url" in r.output
     assert "--feeds" in r.output
+
+
+def test_flow_demo_json_output(tmp_path):
+    ledger = tmp_path / "flow.ledger.jsonl"
+
+    r = CliRunner().invoke(main, ["flow", "demo", "--ledger", str(ledger), "--json-output"])
+
+    assert r.exit_code == 0
+    data = json.loads(r.output)
+    assert data["decision"]["decision"] == "act"
+    assert {action["type"] for action in data["actions"]} == {
+        "internal.notify",
+        "agent.run",
+        "github.comment",
+    }
+    assert ledger.exists()
