@@ -6,7 +6,7 @@
 
 | 平台 | 独立页面 | 统一 actor | TriggerEvent | 证据截图 |
 | --- | --- | --- | --- | --- |
-| Zulip | [Zulip 平台案例](platforms/zulip.md) | `RexWang` | `zulip:message:24:mention:chatrss-watcher@chatarch.local` | `assets/platform-cases/zulip-rexwang-conversation.png` |
+| Zulip | [Zulip 平台案例](platforms/zulip.md) | `RexWang` | `zulip:message:24:mention:watcher@example.invalid` | `assets/platform-cases/zulip-rexwang-conversation.png` |
 | Discourse | [Discourse 平台案例](platforms/discourse.md) | `RexWang` | `discourse:post:25:mention:system` | `assets/platform-cases/discourse-rexwang-conversation.png` |
 | Mattermost | [Mattermost 平台案例](platforms/mattermost.md) | `RexWang` | `mattermost:post:q7xk8wq3q3rbugodkdw6u8cuka:mention:hermes-agent` | `assets/platform-cases/mattermost-rexwang-conversation.png` |
 
@@ -22,7 +22,7 @@
 | Actor message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/20 |
 | Reply message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/21 |
 | Trigger marker | `codex-plan-20260805012352` |
-| Event id | `zulip:message:20:mention:chatrss-watcher@chatarch.local` |
+| Event id | `zulip:message:20:mention:watcher@example.invalid` |
 | Action | `zulip.message.reply` |
 | Verification | watcher readback confirmed reply message `21` |
 
@@ -62,7 +62,7 @@ Zulip actor message
   "source": "zulip",
   "connector": "zulip.messages",
   "event_type": "community.mention.created",
-  "event_id": "zulip:message:20:mention:chatrss-watcher@chatarch.local",
+  "event_id": "zulip:message:20:mention:watcher@example.invalid",
   "subject": {
     "type": "zulip.message",
     "stream": "chatrss-quickstart",
@@ -120,7 +120,7 @@ action_result: SENT external_write=true message_id=21
 action_verified: visible_to_watcher=true
 ```
 
-> 注：内部 ledger/report/secrets 文件保存在任务 project 中；公开文档只记录非敏感 message id、公开 URL、事件类型和动作结果。密码/API key 只保存在本地 `secrets/`，并已做泄露扫描。
+> 注：内部 ledger/report/secrets 文件保存在任务 project 中；公开文档只记录非敏感 message id、公开 URL、事件类型和动作结果。密码/API key 只保存在受保护的私有凭据存储中，并已做泄露扫描。
 
 
 ## 案例：Discourse topic/post 触发 Agent Runs 回帖

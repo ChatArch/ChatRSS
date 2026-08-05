@@ -68,7 +68,7 @@ def test_real_world_case_documents_complete_platform_reply_loops():
 
     for text in [zh, en]:
         assert "codex-plan-20260805012352" in text
-        assert "zulip:message:20:mention:chatrss-watcher@chatarch.local" in text
+        assert "zulip:message:20:mention:watcher@example.invalid" in text
         assert "zulip.message.reply" in text
         assert "discourse:post:25:mention:system" in text
         assert "discourse.post.reply" in text
@@ -87,7 +87,7 @@ def test_platform_case_pages_have_shared_actor_and_screenshots():
     cases = {
         "docs/platforms/zulip.md": [
             "RexWang",
-            "zulip:message:24:mention:chatrss-watcher@chatarch.local",
+            "zulip:message:24:mention:watcher@example.invalid",
             "../assets/platform-cases/zulip-rexwang-conversation.png",
         ],
         "docs/platforms/discourse.md": [

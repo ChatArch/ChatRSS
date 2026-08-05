@@ -2,12 +2,16 @@
 
 ## 2026-08-05
 
+### Fixed
+
+- Released `0.1.2` to sanitize public documentation: replaced internal hostnames, host-local artifact paths, concrete local-domain aliases, credential-file locations, and secret-bearing env key names with placeholders or configuration categories.
+
 ### Added
 
 - Added a `chatrss flow demo` command that runs a local trigger-router-action MVP: sample trigger event → normalized schema → rule/model router → dry-run actions → JSONL ledger.
 - Added shared event/action schema and a minimal pipeline module for future RSSHub, community, and project-progress trigger connectors.
 - Added `docs/trigger-router-action.md` with the initial architecture and practice-source plan.
-- Added a Zulip @mention quick start report from `zhihong.oray`: two accounts, watcher API polling, mention detection, event normalization, routing, dry-run actions, and ledger verification.
+- Added a Zulip @mention quick start report from a controlled service environment: two accounts, watcher API polling, mention detection, event normalization, routing, dry-run actions, and ledger verification.
 - Added ChatTea-style MkDocs documentation structure: scenario hub, CLI tree, capability map, interface tree, quick start, bilingual page mirrors, ChatArch Pages URLs, and preview workflow URL alignment.
 - Added a real-world Zulip case: actor mention -> watcher trigger -> normalized event -> router decision -> Codex-plan research worker -> `zulip.message.reply` action bot reply -> ledger verification.
 - Added a real-world Discourse case: `RexWang` topic/post -> `discourse.posts` TriggerEvent -> route decision -> `discourse.post.reply` action bot reply -> web readback verification.

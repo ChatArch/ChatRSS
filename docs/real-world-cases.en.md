@@ -6,7 +6,7 @@ Verified cases now have their own pages:
 
 | Platform | Page | Shared actor | TriggerEvent | Evidence screenshot |
 | --- | --- | --- | --- | --- |
-| Zulip | [Zulip Platform Case](platforms/zulip.md) | `RexWang` | `zulip:message:24:mention:chatrss-watcher@chatarch.local` | `assets/platform-cases/zulip-rexwang-conversation.png` |
+| Zulip | [Zulip Platform Case](platforms/zulip.md) | `RexWang` | `zulip:message:24:mention:watcher@example.invalid` | `assets/platform-cases/zulip-rexwang-conversation.png` |
 | Discourse | [Discourse Platform Case](platforms/discourse.md) | `RexWang` | `discourse:post:25:mention:system` | `assets/platform-cases/discourse-rexwang-conversation.png` |
 | Mattermost | [Mattermost Platform Case](platforms/mattermost.md) | `RexWang` | `mattermost:post:q7xk8wq3q3rbugodkdw6u8cuka:mention:hermes-agent` | `assets/platform-cases/mattermost-rexwang-conversation.png` |
 
@@ -22,7 +22,7 @@ Core semantics: **a platform event or feed item always comes before ChatRSS acti
 | Actor message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/20 |
 | Reply message | https://zulip.public.wzhecnu.cn/#narrow/channel/chatrss-quickstart/topic/trigger-router-action/near/21 |
 | Trigger marker | `codex-plan-20260805012352` |
-| Event id | `zulip:message:20:mention:chatrss-watcher@chatarch.local` |
+| Event id | `zulip:message:20:mention:watcher@example.invalid` |
 | Action | `zulip.message.reply` |
 | Verification | watcher readback confirmed reply message `21` |
 
@@ -63,7 +63,7 @@ Zulip actor message
   "source": "zulip",
   "connector": "zulip.messages",
   "event_type": "community.mention.created",
-  "event_id": "zulip:message:20:mention:chatrss-watcher@chatarch.local",
+  "event_id": "zulip:message:20:mention:watcher@example.invalid",
   "subject": {
     "type": "zulip.message",
     "stream": "chatrss-quickstart",
@@ -121,7 +121,7 @@ action_result: SENT external_write=true message_id=21
 action_verified: visible_to_watcher=true
 ```
 
-Internal ledgers, reports, and secrets stay in the task project. Public docs record only non-sensitive message ids, public URLs, event types, and action results. Passwords and API keys stay in the host-side `secrets/` directory and were checked for report/playground/script leakage.
+Internal ledgers, reports, and secrets stay in the task project. Public docs record only non-sensitive message ids, public URLs, event types, and action results. Passwords and API keys stay in protected private credential storage, with leakage checks against public reports, scripts, and playground outputs.
 
 
 ## Case: Discourse topic/post triggers an Agent Runs reply
