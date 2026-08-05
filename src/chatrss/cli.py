@@ -10,6 +10,7 @@ from pathlib import Path
 import click
 from chatstyle import render_success, render_warning
 
+from chatrss import __version__
 from chatrss.config import ChatRssConfig
 
 
@@ -37,6 +38,7 @@ def _resolve_rsshub(rsshub_url: str | None) -> str:
 
 
 @click.group()
+@click.version_option(__version__, prog_name="chatrss")
 def main() -> None:
     """chatrss — RSSHub feed 监听 + 飞书联动。"""
 

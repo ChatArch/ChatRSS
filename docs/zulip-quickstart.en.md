@@ -1,40 +1,40 @@
-# Zulip @mention 快速开始
+# Zulip @mention Quick Start
 
-这条 quick start 验证了 ChatRSS 的第一条真实平台 trigger：一个 Zulip 账号发送消息并 @ ChatRSS 托管的 watcher 账号；watcher 账号用自己的 API key 轮询 Zulip；ChatRSS 把 mention 标准化为 Event，进入 router，规划 dry-run action，并写入 ledger。
+This quick start verifies the first real platform trigger for ChatRSS: one Zulip account sends a message mentioning a ChatRSS-managed watcher account; the watcher account polls Zulip with its own API key; ChatRSS normalizes the mention into an event, routes it, plans dry-run actions, and writes a ledger.
 
-## 已验证对象
+## What was verified
 
-Host：`zhihong.oray`
+Host: `zhihong.oray`
 
-平台：
+Platform:
 
-- Zulip URL：`https://zulip.public.wzhecnu.cn`
-- Stream：`chatrss-quickstart`
-- Topic：`trigger-router-action`
+- Zulip URL: `https://zulip.public.wzhecnu.cn`
+- Stream: `chatrss-quickstart`
+- Topic: `trigger-router-action`
 
-账号：
+Accounts:
 
 | account | role |
 | --- | --- |
-| `chatrss-actor@chatarch.local` | 发送测试消息。 |
-| `chatrss-watcher@chatarch.local` / `ChatRSS Watcher Bot` | ChatRSS 托管 watcher；轮询 Zulip 并检测 mention。 |
+| `chatrss-actor@chatarch.local` | Sends the test message. |
+| `chatrss-watcher@chatarch.local` / `ChatRSS Watcher Bot` | ChatRSS-managed watcher; polls Zulip and detects mentions. |
 
-watcher credential 和 API key 只保存在 host 上 task-local secrets 文件，权限为 `0600`；仓库中不保存 password 或 API key。
+The watcher credentials and API key are stored only in the task-local secrets file on the host with mode `0600`; no password or API key is stored in this repository.
 
-## 流程
+## Flow
 
 ```text
 ChatRSS Actor
-  -> 发送一条 Zulip stream 消息并 @ChatRSS Watcher Bot
-  -> Watcher 用自己的 API key 轮询 Zulip messages API
-  -> Zulip message flags 包含 mentioned
-  -> ChatRSS 标准化成 TriggerEvent
-  -> Router/model stub 判断 act
-  -> Action planner 产生 dry-run actions
-  -> JSONL ledger 记录完整链路
+  -> sends a Zulip stream message mentioning @ChatRSS Watcher Bot
+  -> Watcher polls Zulip messages API using its own API key
+  -> Zulip message flags include mentioned
+  -> ChatRSS normalizes the message into TriggerEvent
+  -> Router/model stub decides act
+  -> Action planner produces dry-run actions
+  -> JSONL ledger records the whole chain
 ```
 
-已验证消息：
+Verified message:
 
 ```text
 message_id: 16
@@ -64,7 +64,7 @@ mention_flag: true
 }
 ```
 
-## Router / action result
+## Router/action result
 
 ```json
 {
@@ -79,7 +79,7 @@ mention_flag: true
 }
 ```
 
-所有 action 都是 dry-run / draft：
+All actions were dry-run/draft only:
 
 | action | result | external write |
 | --- | --- | --- |
@@ -87,9 +87,9 @@ mention_flag: true
 | `agent.run` | `DRY_RUN_OK` | false |
 | `zulip.message.draft` | `DRY_RUN_OK` | false |
 
-## Host 产物
+## Host artifacts
 
-在 `zhihong.oray`：
+On `zhihong.oray`:
 
 ```text
 /home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/scripts/zulip_trigger_quickstart.py
@@ -98,7 +98,7 @@ mention_flag: true
 /home/zhihong/Playground/projects/chatrss/08-05-zulip-trigger-quickstart/playground/zulip-mention.ledger.jsonl
 ```
 
-后续进入 ChatRSS 的可复用目标是 `zulip.messages` connector，对应 trigger job：
+The reusable implementation target for ChatRSS is a future `zulip.messages` connector backed by a trigger job like:
 
 ```yaml
 id: zulip-watcher-mention

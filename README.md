@@ -5,64 +5,73 @@
     <a href="./.github/workflows/ci.yml">
         <img src="https://img.shields.io/badge/ci-github_actions-blue.svg" alt="Tests" />
     </a>
-    <a href="./docs/">
+    <a href="https://arch.gh.wzhecnu.cn/ChatRSS/">
         <img src="https://img.shields.io/badge/docs-mkdocs-blue.svg" alt="Documentation" />
     </a>
 </div>
 
 <div align="center">
 
-[English](README.en.md) | [简体中文](README.md)
+[英文版](README.en.md) | [简体中文](README.md)
 </div>
 
-# chatrss
+# ChatRSS
 
-chatrss package
+ChatRSS 是 ChatArch 的 RSS / RSSHub-first trigger-router-action 工具：RSSHub 负责把外部世界变成 feed，ChatRSS 负责把 feed 和其他事件源变成可去重、可路由、可审计、可触发 Agent 的事件流。
+
+文档站：<https://arch.gh.wzhecnu.cn/ChatRSS/>
+
+## 现在能做什么
+
+| 能力 | 当前状态 | 入口 |
+| --- | --- | --- |
+| RSSHub/GitHub feed 监听 | 已实现 | `chatrss watch` |
+| 本地 RSSHub 容器辅助管理 | 已实现，需要本机 Docker / docker-compose | `chatrss server ...` |
+| 本地事件日志查看 | 已实现 | `chatrss cat` |
+| Trigger-Router-Action 本地闭环 | 已实现 dry-run MVP | `chatrss flow demo` |
+| 多平台 trigger / router / action 框架 | 规划中，已有 schema 和 dry-run seam | [能力地图](docs/capability-map.md) |
 
 ## 快速开始
 
 ```bash
-pip install -e ".[dev]"
-chatrss hello ChatArch
+python -m pip install -e ".[dev,docs]"
+chatrss --help
+chatrss --version
+chatrss flow demo --ledger ./playground/flow.ledger.jsonl --json-output
 python -m pytest -q
-python -m build
+mkdocs build --strict
 ```
 
-## 处理策略
-
-`chatrss watch` 现在按任务导向处理新事件：
-
-- `issue` / `pull` / `comments`：视为待处理任务，发送飞书通知并追加文档事件行。
-- `repo_event`：视为背景上下文，只落本地 JSONL，避免噪音。
-- 通知文案强调“先完成当前任务，再看是否需要整理/封装”。
-
-
-## Trigger-Router-Action MVP
-
-`chatrss flow demo` 可以在本地跑通最小 trigger-router-action 闭环：内置示例事件会被标准化为 Event，经规则和 model-router stub 判断后，生成 dry-run action 并写入 JSONL ledger。
+如果本机没有全局 `chatrss`，可在源码目录用：
 
 ```bash
-chatrss flow demo --ledger ./playground/flow.ledger.jsonl --json-output
+PYTHONPATH=src python -m chatrss.cli flow demo --ledger ./playground/flow.ledger.jsonl --json-output
 ```
 
-这个 MVP 用来验证新的 minor 版本方向：RSS/RSSHub 先作为 trigger connector，后续再连接真实社区对话源、GitHub 项目进展、模型判断和 action adapter。
+## 文档入口
 
-## CLI 规范
+- [快速开始](docs/quickstart.md)：安装、demo、watch、RSSHub server 边界。
+- [CLI 树](docs/cli-tree.md)：当前已实现命令树和 minor 目标命令树。
+- [能力地图](docs/capability-map.md)：Trigger、Event、Router、Model、Action、Ledger 的状态和边界。
+- [接口树](docs/interface-tree.md)：CLI 到 Python API / module 的映射。
+- [Trigger-Router-Action 设计](docs/trigger-router-action.md)：架构和事件协议。
+- [真实平台实践计划](docs/practice-plan.md)：Discourse、Zulip、Revolt、GitHub、Gitea 接入顺序。
+- [Zulip @mention 快速开始](docs/zulip-quickstart.md)：第一条真实平台 trigger 验证。
 
-这个模板默认依赖 `chatstyle>=0.1.0` 和 `chatenv>=0.1.1`，新的命令应优先使用：
+## Minor 版本方向
 
-- `CommandSchema` / `CommandField` 描述输入。
-- `add_interactive_option()` 提供统一 `-i/-I`。
-- `resolve_command_inputs()` 统一缺参补问、默认值、TTY 与校验。
+```text
+Trigger Connector
+  -> Event Schema / Inbox
+  -> Rule Router
+  -> Model Router
+  -> Action Planner
+  -> Action Executor
+  -> Ledger
+```
 
-## 目录结构
-
-- `src/`：包源码
-- `tests/code-tests/`：代码测试和历史测试迁移
-- `tests/cli-tests/`：真实 CLI 测试，doc-first
-- `tests/mock-cli-tests/`：mock/fake CLI 测试，doc-first
-- `docs/`：长期维护文档，由 mkdocs 构建
+RSS / RSSHub 是第一批 trigger connector，不是完整 workflow engine。外部写动作默认 `dry-run`、`draft` 或 `approval_required`，直到 adapter、幂等和人工审批机制明确。
 
 ## 开发说明
 
-扩展脚手架前，先阅读 `DEVELOP.md` 和 `AGENTS.md`。
+扩展脚手架前，先阅读 `DEVELOP.md`、`AGENTS.md` 和 `docs/cli-tree.md`。新增命令时同步更新 CLI help、测试、README、MkDocs 页面和 changelog。

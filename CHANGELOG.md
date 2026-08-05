@@ -8,6 +8,7 @@
 - Added shared event/action schema and a minimal pipeline module for future RSSHub, community, and project-progress trigger connectors.
 - Added `docs/trigger-router-action.md` with the initial architecture and practice-source plan.
 - Added a Zulip @mention quick start report from `zhihong.oray`: two accounts, watcher API polling, mention detection, event normalization, routing, dry-run actions, and ledger verification.
+- Added ChatTea-style MkDocs documentation structure: scenario hub, CLI tree, capability map, interface tree, quick start, bilingual page mirrors, ChatArch Pages URLs, and preview workflow URL alignment.
 
 ## 2026-05-21
 

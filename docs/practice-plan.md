@@ -251,26 +251,26 @@ route_to: router.default
 
 ## 4. 最小实践顺序
 
-### Phase 0：本地闭环
+### 本地闭环
 
 - 用 `chatrss flow demo` 跑通 sample event。
 - 验证 ledger 里有 `event_received`、`route_decision`、`action_planned`、`action_result`。
 
-### Phase 1：GitHub / RSSHub 项目进展
+### GitHub / RSSHub 项目进展
 
 - 选 `ChatArch/ChatRSS` 或另一个低风险 repo。
 - RSSHub 订阅 issue/PR/comments。
 - 新建测试 issue/comment 或使用已有公开更新。
 - 验证 ChatRSS 生成标准 Event 和 dry-run action。
 
-### Phase 2：GitHub 或 Gitea mention notification
+### GitHub 或 Gitea mention notification
 
 - 建 watcher 账号/token。
 - actor 账号 @ watcher。
 - trigger 用 watcher token 轮询 notifications。
 - 验证能捕获 mention，并读取 thread context。
 
-### Phase 3：Zulip/Discourse/Revolt 中任选一个社区平台
+### 首个社区平台：Zulip / Discourse / Revolt 三选一
 
 优先选 API 最容易的一个做第一社区实践：
 
@@ -280,9 +280,9 @@ route_to: router.default
 4. Router 输出 `agent.run` + draft reply action。
 5. Ledger 记录完整链路。
 
-### Phase 4：补齐三个社区平台
+### 三个社区平台补齐
 
-把 Phase 3 的 connector contract 复用到 Discourse、Zulip、Revolt。
+把首个社区实践中的 connector contract 复用到 Discourse、Zulip、Revolt。
 
 ## 5. 安全和状态边界
 

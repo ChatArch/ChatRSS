@@ -1,7 +1,76 @@
-site_name: chatrss 文档
+site_name: ChatRSS 文档
+site_url: https://arch.gh.wzhecnu.cn/ChatRSS/
+repo_url: https://github.com/ChatArch/ChatRSS
+repo_name: ChatArch/ChatRSS
+edit_uri: edit/main/docs/
+docs_dir: docs/
 theme:
   name: material
   language: zh
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.action.edit
+plugins:
+  - search
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: zh
+          default: true
+          name: 中文
+          build: true
+          site_name: ChatRSS 文档
+        - locale: en
+          name: English
+          build: true
+          site_name: ChatRSS Documentation
+          nav_translations:
+            首页: Home
+            入门: Getting Started
+            快速开始: Quick Start
+            命令与接口: Commands and Interfaces
+            CLI 树: CLI Tree
+            能力地图: Capability Map
+            接口树: Interface Tree
+            架构: Architecture
+            Trigger-Router-Action 设计: Trigger-Router-Action Design
+            实践: Practice
+            真实平台实践计划: Real Platform Practice Plan
+            Zulip @mention 快速开始: Zulip @mention Quick Start
+extra:
+  alternate:
+    - name: 中文
+      link: /ChatRSS/
+      lang: zh
+    - name: English
+      link: /ChatRSS/en/
+      lang: en
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
 nav:
   - 首页: index.md
-  - English: index.en.md
+  - 入门:
+      - 快速开始: quickstart.md
+  - 命令与接口:
+      - CLI 树: cli-tree.md
+      - 能力地图: capability-map.md
+      - 接口树: interface-tree.md
+  - 架构:
+      - Trigger-Router-Action 设计: trigger-router-action.md
+  - 实践:
+      - 真实平台实践计划: practice-plan.md
+      - Zulip @mention 快速开始: zulip-quickstart.md
