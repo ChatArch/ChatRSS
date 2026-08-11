@@ -1,24 +1,29 @@
 # ChatRSS CLI Tree
 
-This page follows the ChatTea documentation pattern: show the real command surface first, then the minor-version target tree. The target tree is a design contract, not current `--help` output.
+This page follows the ChatTea documentation pattern: show the current real CLI that can be read back with `chatrss --tree`, then the minor-version target tree. The target tree is a design contract, not current `--help` output.
 
 ## Implemented command tree
 
+This tree comes from the currently registered Click surface and can be read back with `chatrss --tree`:
+
 ```text
-chatrss                                      # RSSHub feed watcher + event-routing experiment entry
-├── init [implemented]                       # Initialize seen state to avoid replaying historical items
-├── watch [implemented]                      # Watch GitHub/RSSHub feeds and notify/write docs for new items
-├── cat [implemented]                        # Read local event logs without network access
-├── ps [implemented]                         # Show currently running chatrss watch processes
-├── server [implemented]                     # Manage local RSSHub service; requires Docker/docker-compose
-│   ├── start                                # Start RSSHub container
-│   ├── stop                                 # Stop RSSHub container
-│   ├── restart                              # Restart RSSHub container
-│   ├── status                               # Show container status and health
-│   ├── logs                                 # Show container logs
-│   └── url                                  # Print current RSSHub URL
-└── flow [implemented]                       # Run local trigger-router-action flow
-    └── demo                                 # Built-in demo event -> router -> dry-run actions -> ledger
+chatrss
+├── --help  # Show this message and exit.
+├── --version  # Show the installed ChatRSS version.
+├── --tree  # Print this registered command tree and exit.
+├── cat [REPO] [--limit LIMIT] [--json-output]  # 查看本地事件日志（只读，不访问网络）。
+├── flow  # 运行 trigger-router-action 本地闭环。
+│   └── demo [--ledger LEDGER] [--json-output]  # 用内置示例事件跑通 trigger -> router -> action -> ledger。
+├── init [REPO] [--rsshub-url RSSHUB-URL]  # 初始化 seen 状态，避免首次运行重放历史条目。
+├── ps  # 查看当前正在运行的 chatrss watch 进程。
+├── server  # 管理本地 RSSHub 服务（基于 docker-compose）。
+│   ├── logs [--tail TAIL]  # 查看 RSSHub 容器日志。
+│   ├── restart  # 重启 RSSHub 容器。
+│   ├── start [--port PORT]  # 启动 RSSHub 容器。
+│   ├── status  # 查看 RSSHub 容器状态。
+│   ├── stop  # 停止 RSSHub 容器。
+│   └── url  # 打印当前 RSSHub 地址。
+└── watch [REPO] [--interval INTERVAL] [--rsshub-url RSSHUB-URL] [--feeds FEEDS] [--doc DOC] [--notify-user NOTIFY-USER] [--once]  # 监听仓库 RSS feed，发现新条目时通知飞书 + 更新文档。
 ```
 
 The current CLI intentionally runs the old watcher and the new pipeline seam. Planned subcommands are not exposed as successful placeholders.

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-08-11
+
+### Added
+
+- Released `0.1.3` with top-level `chatrss --tree` generated from the registered Click command surface.
+
+### Changed
+
+- Updated README, quick start, CLI tree, and interface tree docs to include live `chatrss --tree` readback.
+- Raised ChatArch internal dependency floor to `chatenv>=0.2.4,<0.3.0` and pinned docs Material to the strict-build-safe `<9.7` window.
+
 ## 2026-08-05
 
 ### Fixed

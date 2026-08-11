@@ -37,6 +37,7 @@ Documentation: <https://arch.gh.wzhecnu.cn/ChatRSS/>
 ```bash
 python -m pip install -e ".[dev,docs]"
 chatrss --help
+chatrss --tree
 chatrss --version
 chatrss flow demo --ledger ./playground/flow.ledger.jsonl --json-output
 python -m pytest -q
@@ -52,7 +53,7 @@ PYTHONPATH=src python -m chatrss.cli flow demo --ledger ./playground/flow.ledger
 ## Documentation map
 
 - [Quick start](docs/quickstart.en.md): install, demo, watch, and RSSHub server boundary.
-- [CLI tree](docs/cli-tree.en.md): implemented command tree and minor-version target tree.
+- [CLI tree](docs/cli-tree.en.md): `chatrss --tree` implemented command tree and minor-version target tree.
 - [Capability map](docs/capability-map.en.md): Trigger, Event, Router, Model, Action, and Ledger status.
 - [Interface tree](docs/interface-tree.en.md): CLI-to-Python API/module mapping.
 - [Trigger-Router-Action design](docs/trigger-router-action.md): architecture and event protocol.
