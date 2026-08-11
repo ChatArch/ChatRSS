@@ -6,6 +6,8 @@ The interface tree maps CLI commands to Python modules and reusable functions. T
 
 ```text
 chatrss
+├── --tree
+│   └── chatrss.cli.render_cli_tree()
 ├── init
 │   └── chatrss.watcher.init_seen(repo, rsshub_url)
 ├── watch

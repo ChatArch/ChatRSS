@@ -6,6 +6,8 @@
 
 ```text
 chatrss
+├── --tree
+│   └── chatrss.cli.render_cli_tree()
 ├── init
 │   └── chatrss.watcher.init_seen(repo, rsshub_url)
 ├── watch

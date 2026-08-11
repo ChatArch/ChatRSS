@@ -1,24 +1,29 @@
 # ChatRSS CLI 树
 
-这页按 ChatTea 文档风格展示命令面：先列当前真实存在的 CLI，再列 minor 版本目标树。目标树是设计约定，不等于当前 `--help` 已发布命令。
+这页按 ChatTea 文档风格展示命令面：先列可用 `chatrss --tree` 回读的当前真实 CLI，再列 minor 版本目标树。目标树是设计约定，不等于当前 `--help` 已发布命令。
 
 ## 当前已实现命令树
 
+以下命令树来自当前 Click 注册面，可用 `chatrss --tree` 直接回读：
+
 ```text
-chatrss                                      # RSSHub feed 监听 + 事件路由实验入口
-├── init [已实现]                            # 初始化 seen 状态，避免首次运行重放历史条目
-├── watch [已实现]                           # 监听 GitHub/RSSHub feed，发现新条目后通知/写文档
-├── cat [已实现]                             # 查看本地事件日志，只读，不访问网络
-├── ps [已实现]                              # 查看当前正在运行的 chatrss watch 进程
-├── server [已实现]                          # 管理本地 RSSHub 服务；依赖 Docker/docker-compose
-│   ├── start                                # 启动 RSSHub 容器
-│   ├── stop                                 # 停止 RSSHub 容器
-│   ├── restart                              # 重启 RSSHub 容器
-│   ├── status                               # 查看容器状态和健康检查
-│   ├── logs                                 # 查看容器日志
-│   └── url                                  # 打印当前 RSSHub 地址
-└── flow [已实现]                            # 运行 trigger-router-action 本地闭环
-    └── demo                                 # 内置示例事件 -> router -> dry-run actions -> ledger
+chatrss
+├── --help  # Show this message and exit.
+├── --version  # Show the installed ChatRSS version.
+├── --tree  # Print this registered command tree and exit.
+├── cat [REPO] [--limit LIMIT] [--json-output]  # 查看本地事件日志（只读，不访问网络）。
+├── flow  # 运行 trigger-router-action 本地闭环。
+│   └── demo [--ledger LEDGER] [--json-output]  # 用内置示例事件跑通 trigger -> router -> action -> ledger。
+├── init [REPO] [--rsshub-url RSSHUB-URL]  # 初始化 seen 状态，避免首次运行重放历史条目。
+├── ps  # 查看当前正在运行的 chatrss watch 进程。
+├── server  # 管理本地 RSSHub 服务（基于 docker-compose）。
+│   ├── logs [--tail TAIL]  # 查看 RSSHub 容器日志。
+│   ├── restart  # 重启 RSSHub 容器。
+│   ├── start [--port PORT]  # 启动 RSSHub 容器。
+│   ├── status  # 查看 RSSHub 容器状态。
+│   ├── stop  # 停止 RSSHub 容器。
+│   └── url  # 打印当前 RSSHub 地址。
+└── watch [REPO] [--interval INTERVAL] [--rsshub-url RSSHUB-URL] [--feeds FEEDS] [--doc DOC] [--notify-user NOTIFY-USER] [--once]  # 监听仓库 RSS feed，发现新条目时通知飞书 + 更新文档。
 ```
 
 当前命令以“能跑通旧 watcher + 新 pipeline seam”为目标，没有把所有规划子命令提前做成空壳。
