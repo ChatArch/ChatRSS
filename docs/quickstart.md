@@ -8,6 +8,7 @@
 python -m pip install -e ".[dev,docs]"
 chatrss --help
 chatrss --tree
+chatrss --tree-brief
 chatrss --version
 ```
 

@@ -6,8 +6,8 @@
 
 ```text
 chatrss
-├── --tree
-│   └── chatrss.cli.render_cli_tree()
+├── --tree / --tree-brief
+│   └── chatstyle.add_tree_option() → chatrss.cli.main 注册面
 ├── init
 │   └── chatrss.watcher.init_seen(repo, rsshub_url)
 ├── watch

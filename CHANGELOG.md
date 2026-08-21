@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-22
+
+### Added
+
+- Released `0.1.4` with top-level `chatrss --tree-brief` output from the registered Click command surface.
+- Added typed ChatEnv profile/storage and installed-console-script contract coverage.
+
+### Changed
+
+- Replaced the package-local tree renderer with ChatStyle `add_tree_option()`.
+- Raised runtime bounds to `chatstyle>=0.2.0,<0.3.0` and `chatenv>=0.2.10,<0.3.0`.
+- Expanded CI to Python 3.10–3.12 with version, full-tree, brief-tree, build, Twine, and strict docs gates.
+
+### Fixed
+
+- Marked the Lark document token as sensitive and stopped echoing document tokens or user IDs from `chatrss watch`.
+
 ## 2026-08-11
 
 ### Added
