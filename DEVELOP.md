@@ -2,7 +2,8 @@
 
 ## CLI Rules
 
-- Use bounded ChatArch internal dependencies as the canonical CLI interaction runtime: `chatstyle>=0.1.1,<0.2.0` and `chatenv>=0.2.4,<0.3.0`.
+- Keep the real console script on `chatstyle>=0.2.0,<0.3.0` and use `add_tree_option()` for shared `--tree` / `--tree-brief` output from registered Click metadata.
+- Keep the typed provider entry point on `chatenv>=0.2.10,<0.3.0`; use ChatEnv profile discovery and storage paths rather than package-local profile files.
 - Prefer `CommandSchema`, `CommandField`, `add_interactive_option()`, and `resolve_command_inputs()` for new commands.
 - Missing required args should auto-enter interactive mode when recoverable.
 - `-i` forces interactive mode; `-I` disables prompting and must fail fast.
@@ -16,6 +17,7 @@
 - Put real CLI coverage under `tests/cli-tests/`.
 - Put mock/fake CLI coverage under `tests/mock-cli-tests/`.
 - Keep `README.md`, `docs/`, and `CHANGELOG.md` in sync with user-facing changes.
+- Read back both `chatrss --tree` and `chatrss --tree-brief` after changing the command registry.
 
 ## Automation
 

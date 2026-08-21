@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 
 import click
-from chatstyle import render_success, render_warning
+from chatstyle import add_tree_option, render_success, render_warning
 
 from chatrss import __version__
 from chatrss.config import ChatRssConfig
@@ -37,106 +37,9 @@ def _resolve_rsshub(rsshub_url: str | None) -> str:
     return rsshub_url or cfg.CHATRSS_RSSHUB_URL.value or "http://localhost:1200"
 
 
-def _format_metavar(name: str) -> str:
-    return name.replace("_", "-").upper()
-
-
-def _format_argument(param: click.Argument) -> str:
-    metavar = _format_metavar(param.name or "ARG")
-    if param.nargs == -1:
-        metavar = f"{metavar}..."
-    if not param.required:
-        return f"[{metavar}]"
-    return f"<{metavar}>"
-
-
-def _format_option(param: click.Option) -> str:
-    visible_opts = [opt for opt in param.opts if opt.startswith("--")]
-    visible_opts.extend(opt for opt in param.secondary_opts if opt.startswith("--"))
-    flag = visible_opts[0] if visible_opts else (param.opts[0] if param.opts else param.name or "OPTION")
-    if param.is_flag:
-        return f"[{flag}]"
-    return f"[{flag} {_format_metavar(param.name or 'VALUE')}]"
-
-
-def _command_signature(command: click.Command) -> str:
-    parts: list[str] = []
-    for param in command.params:
-        if getattr(param, "hidden", False):
-            continue
-        if isinstance(param, click.Argument):
-            parts.append(_format_argument(param))
-        elif isinstance(param, click.Option):
-            parts.append(_format_option(param))
-    return " ".join(parts)
-
-
-def _command_summary(command: click.Command) -> str:
-    return (command.short_help or command.help or "").strip().splitlines()[0]
-
-
-def _group_items(group: click.Group) -> list[tuple[str, str | click.Command]]:
-    items: list[tuple[str, str | click.Command]] = []
-    if group is main:
-        items.extend(
-            [
-                ("--help", "Show this message and exit."),
-                ("--version", "Show the installed ChatRSS version."),
-                ("--tree", "Print this registered command tree and exit."),
-            ]
-        )
-    for name in group.list_commands(click.Context(group)):
-        command = group.get_command(click.Context(group), name)
-        if command is None or command.hidden:
-            continue
-        items.append((name, command))
-    return items
-
-
-def render_cli_tree(root: click.Group | None = None) -> str:
-    """Render the registered Click command tree for `chatrss --tree`."""
-    if root is None:
-        root = main
-    lines = [root.name or "chatrss"]
-
-    def walk(items: list[tuple[str, str | click.Command]], prefix: str = "") -> None:
-        for index, (name, item) in enumerate(items):
-            last = index == len(items) - 1
-            branch = "└── " if last else "├── "
-            child_prefix = prefix + ("    " if last else "│   ")
-            if isinstance(item, str):
-                lines.append(f"{prefix}{branch}{name}  # {item}")
-                continue
-            signature = _command_signature(item)
-            summary = _command_summary(item)
-            label = f"{name} {signature}".strip()
-            lines.append(f"{prefix}{branch}{label}  # {summary}")
-            if isinstance(item, click.Group):
-                walk(_group_items(item), child_prefix)
-
-    walk(_group_items(root))
-    return "\n".join(lines)
-
-
-def _tree_callback(ctx: click.Context, param: click.Option, value: bool) -> None:
-    if not value or ctx.resilient_parsing:
-        return
-    if not isinstance(ctx.command, click.Group):
-        raise click.ClickException("--tree is only available on command groups")
-    click.echo(render_cli_tree(ctx.command))
-    ctx.exit()
-
-
 @click.group(name="chatrss")
 @click.version_option(__version__, prog_name="chatrss")
-@click.option(
-    "--tree",
-    is_flag=True,
-    is_eager=True,
-    expose_value=False,
-    callback=_tree_callback,
-    help="Print the registered CLI command tree and exit.",
-)
+@add_tree_option(renderer_options={"root_name": "chatrss"})
 def main() -> None:
     """chatrss — RSSHub feed 监听 + 飞书联动。"""
 
@@ -145,13 +48,13 @@ def main() -> None:
 
 @main.group("server")
 def server_group() -> None:
-    """管理本地 RSSHub 服务（基于 docker-compose）。"""
+    """管理本地 RSSHub Docker 服务；可能变更容器状态。"""
 
 
 @server_group.command("start")
 @click.option("--port", default=1200, type=int, show_default=True, help="监听端口")
 def server_start(port: int) -> None:
-    """启动 RSSHub 容器。"""
+    """启动 RSSHub 容器并输出服务 URL；写 Docker 状态。"""
     from chatrss.server import start, is_running, get_url
 
     if is_running(port):
@@ -168,7 +71,7 @@ def server_start(port: int) -> None:
 
 @server_group.command("stop")
 def server_stop() -> None:
-    """停止 RSSHub 容器。"""
+    """停止 RSSHub 容器；写 Docker 状态。"""
     from chatrss.server import stop
 
     click.echo("停止 RSSHub...")
@@ -181,7 +84,7 @@ def server_stop() -> None:
 
 @server_group.command("restart")
 def server_restart() -> None:
-    """重启 RSSHub 容器。"""
+    """重启 RSSHub 容器；写 Docker 状态。"""
     from chatrss.server import restart
 
     click.echo("重启 RSSHub...")
@@ -194,7 +97,7 @@ def server_restart() -> None:
 
 @server_group.command("status")
 def server_status() -> None:
-    """查看 RSSHub 容器状态。"""
+    """只读查看 RSSHub 容器状态和健康检查。"""
     from chatrss.server import status, is_running
 
     click.echo(status())
@@ -205,7 +108,7 @@ def server_status() -> None:
 @server_group.command("logs")
 @click.option("--tail", default=50, type=int, show_default=True)
 def server_logs(tail: int) -> None:
-    """查看 RSSHub 容器日志。"""
+    """只读输出 RSSHub 容器日志。"""
     from chatrss.server import logs
 
     click.echo(logs(tail))
@@ -213,7 +116,7 @@ def server_logs(tail: int) -> None:
 
 @server_group.command("url")
 def server_url() -> None:
-    """打印当前 RSSHub 地址。"""
+    """只读输出当前 RSSHub 地址和运行状态。"""
     from chatrss.server import get_url, is_running
     url = get_url()
     status = "✅" if is_running() else "❌ 未运行"
@@ -226,7 +129,7 @@ def server_url() -> None:
 @click.argument("repo", required=False)
 @click.option("--rsshub-url", default=None, envvar="CHATRSS_RSSHUB_URL")
 def cmd_init(repo: str | None, rsshub_url: str | None) -> None:
-    """初始化 seen 状态，避免首次运行重放历史条目。
+    """拉取 feed 并写 seen 状态，避免首次运行重放历史条目。
 
     REPO: owner/name，如 leanprover/lean-eval
     """
@@ -256,7 +159,7 @@ def cmd_init(repo: str | None, rsshub_url: str | None) -> None:
 def cmd_watch(repo: str | None, interval: int, rsshub_url: str | None,
               feeds: str | None, doc: str | None,
               notify_user: str | None, once: bool) -> None:
-    """监听仓库 RSS feed，发现新条目时通知飞书 + 更新文档。
+    """轮询 feed、写事件日志，并可通知飞书和更新文档。
 
     REPO: owner/name，如 leanprover/lean-eval
     """
@@ -274,8 +177,8 @@ def cmd_watch(repo: str | None, interval: int, rsshub_url: str | None,
     click.echo(f"  RSSHub:   {url}")
     click.echo(f"  feeds:    {feeds or 'issue,pull,repo_event,comments'}")
     click.echo(f"  间隔:     {interval}s")
-    click.echo(f"  文档:     {effective_doc or '未配置'}")
-    click.echo(f"  通知:     {effective_user or '未配置'}")
+    click.echo(f"  文档:     {'已配置（值不回显）' if effective_doc else '未配置'}")
+    click.echo(f"  通知:     {'已配置（值不回显）' if effective_user else '未配置'}")
     click.echo(f"  策略:     启动时静默同步；issue/PR/comment 作为任务处理，repo_event 只落盘")
     click.echo()
 
@@ -312,7 +215,7 @@ def cmd_watch(repo: str | None, interval: int, rsshub_url: str | None,
 @click.option("--limit", default=20, type=int, show_default=True)
 @click.option("--json-output", is_flag=True)
 def cmd_cat(repo: str | None, limit: int, json_output: bool) -> None:
-    """查看本地事件日志（只读，不访问网络）。"""
+    """只读输出本地事件日志；不访问网络。"""
     from chatrss.watcher import read_jsonl, jsonl_path
 
     r = _resolve_repo(repo)
@@ -336,7 +239,7 @@ def cmd_cat(repo: str | None, limit: int, json_output: bool) -> None:
 
 @main.group("flow")
 def flow_group() -> None:
-    """运行 trigger-router-action 本地闭环。"""
+    """运行 trigger-router-action 本地 dry-run 闭环。"""
 
 
 @flow_group.command("demo")
@@ -348,7 +251,7 @@ def flow_group() -> None:
 )
 @click.option("--json-output", is_flag=True, help="输出完整 JSON 结果。")
 def flow_demo(ledger: Path | None, json_output: bool) -> None:
-    """用内置示例事件跑通 trigger -> router -> action -> ledger。"""
+    """用内置事件 dry-run action 并写 JSONL ledger。"""
     from chatrss.pipeline import default_ledger_path, run_event_flow, sample_multi_agent_event
 
     ledger_path = ledger or default_ledger_path("flow-demo")
@@ -369,7 +272,7 @@ def flow_demo(ledger: Path | None, json_output: bool) -> None:
 
 @main.command("ps")
 def cmd_ps() -> None:
-    """查看当前正在运行的 chatrss watch 进程。"""
+    """只读输出当前 chatrss watch 进程。"""
     import subprocess as _sp
     result = _sp.run(
         ["pgrep", "-af", "chatrss watch"],

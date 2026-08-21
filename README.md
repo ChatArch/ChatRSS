@@ -38,6 +38,7 @@ ChatRSS 是 ChatArch 的 RSS / RSSHub-first trigger-router-action 工具：RSSHu
 python -m pip install -e ".[dev,docs]"
 chatrss --help
 chatrss --tree
+chatrss --tree-brief
 chatrss --version
 chatrss flow demo --ledger ./playground/flow.ledger.jsonl --json-output
 python -m pytest -q
@@ -53,7 +54,7 @@ PYTHONPATH=src python -m chatrss.cli flow demo --ledger ./playground/flow.ledger
 ## 文档入口
 
 - [快速开始](docs/quickstart.md)：安装、demo、watch、RSSHub server 边界。
-- [CLI 树](docs/cli-tree.md)：`chatrss --tree` 当前已实现命令树和 minor 目标命令树。
+- [CLI 树](docs/cli-tree.md)：`chatrss --tree` / `chatrss --tree-brief` 当前已实现命令树和 minor 目标命令树。
 - [能力地图](docs/capability-map.md)：Trigger、Event、Router、Model、Action、Ledger 的状态和边界。
 - [接口树](docs/interface-tree.md)：CLI 到 Python API / module 的映射。
 - [Trigger-Router-Action 设计](docs/trigger-router-action.md)：架构和事件协议。
